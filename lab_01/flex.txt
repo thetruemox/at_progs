@@ -1,0 +1,32 @@
+%{
+#include <time.h>
+FILE *out;
+extern FILE * yyin;
+int num = 0, res;
+int start, stop;
+%}
+%%
+[<][-][a-zA-Z!][a-zA-Z0-9]{0,15}([&|\||\^][a-zA-Z!][a-zA-Z0-9]{0,15})*[#]	{return 1;}
+[!][q] {return 0;}
+%%
+int main() {
+printf("Working...\n");
+
+yyin = fopen("test.txt", "r");
+out = fopen("yyout.txt", "w");
+
+while(1)
+{
+start = clock();
+res = yylex();
+stop = clock();
+
+if (!res) break;
+fprintf(out, "%d ", num);
+fprintf(out, "time: %d", (stop - start) / CLK_TCK);
+num++;
+}
+
+printf("Job`s done!\n");
+return 0;
+}
