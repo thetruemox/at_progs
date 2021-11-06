@@ -2,6 +2,7 @@
 
 ST_Node::ST_Node(char value, int index, stn_type type)
 {
+	this->is_checked = 0;
 	this->value = value;
 	this->index = index;
 	this->type = type;

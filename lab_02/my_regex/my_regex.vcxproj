@@ -140,11 +140,16 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="my_regex.cpp" />
+    <ClCompile Include="NFA_Builder.cpp" />
+    <ClCompile Include="NFA_Graph.cpp" />
+    <ClCompile Include="NFA_Node.cpp" />
     <ClCompile Include="ST_Node.cpp" />
     <ClCompile Include="Syntax_Tree.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="NFA_Builder.h" />
+    <ClInclude Include="NFA_Graph.h" />
+    <ClInclude Include="NFA_Node.h" />
     <ClInclude Include="ST_Node.h" />
     <ClInclude Include="Syntax_Tree.h" />
   </ItemGroup>

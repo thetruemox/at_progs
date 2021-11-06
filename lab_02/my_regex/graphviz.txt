@@ -1,0 +1,12 @@
+digraph G {
+0 -> 1[label="a"];
+1 -> 6[label="epsilon"];
+6 -> 2[label="epsilon"];
+6 -> 4[label="epsilon"];
+2 -> 3[label="b"];
+3 -> 7[label="epsilon"];
+7 -> 9[label="epsilon"];
+7 -> 6[label="epsilon"];
+4 -> 5[label="2"];
+5 -> 7[label="epsilon"];
+}

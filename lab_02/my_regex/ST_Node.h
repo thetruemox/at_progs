@@ -1,5 +1,6 @@
 #pragma once
 #include <list>
+#include <string>
 
 enum stn_type 
 {
@@ -11,7 +12,9 @@ class ST_Node
 public:
 	ST_Node(char value, int index, stn_type type);
 
-	char value;
+	int is_checked;
+
+	std::string value;
 	int index;
 	ST_Node* parent;
 	ST_Node* left_ptr;
