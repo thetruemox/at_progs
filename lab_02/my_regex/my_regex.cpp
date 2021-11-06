@@ -7,7 +7,7 @@ using namespace std;
 
 int main()
 {
-    string reg = "(m.e.((o.w)|(p.h.i)))+";
+    string reg = "m.a.i.n.#(.#)";
     NFA_Builder* builder = new NFA_Builder(reg);
 
     builder->draw_graph("nfa_graphviz.txt");

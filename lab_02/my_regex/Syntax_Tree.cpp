@@ -12,6 +12,8 @@ Syntax_Tree::Syntax_Tree(std::string regex)
 
         for (int i = 0; i < reg.length(); i++)
         {
+            if (reg[i] == '#') i+=2;
+
             if (reg[i] == '(')
             {
                 first = i;
@@ -33,8 +35,18 @@ Syntax_Tree::Syntax_Tree(std::string regex)
         {
             if (reg[i] != '+' && reg[i] != '|' && reg[i] != ' ' && reg[i] != '.')
             {
-                create_node(reg[i], i, a_node);
-                reg[i] = ' ';
+                if (reg[i] == '#')
+                {
+                    create_node(reg[i + 1], i + 1, a_node);
+                    reg[i] = ' ';
+                    reg[i + 1] = ' ';
+                    ++i;
+                }
+                else
+                {
+                    create_node(reg[i], i, a_node);
+                    reg[i] = ' ';
+                }
             }
         }
 
@@ -104,6 +116,13 @@ void Syntax_Tree::draw_syntax_tree(std::string file_name)
     std::ofstream* out = new std::ofstream(file_name);
 
     *out << "digraph G {" << std::endl;
+
+    if ((this->root)->left_ptr == nullptr && (this->root)->right_ptr == nullptr)
+    {
+        *out << "\"" << "id:" << (this->root)->index << " " << (this->root)->value << "\"" << std::endl;
+        *out << "}";
+        return;
+    }
 
     for (auto it = this->nodes.begin(); it != this->nodes.end(); it++)
     {
@@ -177,13 +196,15 @@ void Syntax_Tree::add_children(int parent_i, int child_i)
     {
 	    if (is_this_bracket(child_i) && _get_bracket_type(child_i) == BT_open)
 	    {
-		    child_i++;
+            ++child_i;
 	    }
 	    else if (is_this_bracket(child_i) && _get_bracket_type(child_i) == BT_close)
 	    {
-		    child_i--;
+            --child_i;
 	    }
     }
+
+    if (this->_get_type(child_i) == stn_error) ++child_i;
 
 	ST_Node* child = _get_node(child_i);
 

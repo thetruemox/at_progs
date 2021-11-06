@@ -67,7 +67,15 @@ void NFA_Builder::create_graph(ST_Node* node)
 		node_A = new NFA_Node(nfa_start, this->nfa_nodes_id++);
 		node_B = new NFA_Node(nfa_receiving, this->nfa_nodes_id++);
 
-		node_A->make_link(node_B, node->value);
+		if (node->value == "^")
+		{
+			node_A->make_link(node_B, "eps");
+		}
+		else
+		{ 
+			node_A->make_link(node_B, node->value);
+		}
+
 		new_graph->add_node(node_A);
 		new_graph->add_node(node_B);
 
