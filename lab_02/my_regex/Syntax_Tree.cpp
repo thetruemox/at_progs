@@ -80,9 +80,9 @@ ST_Node* Syntax_Tree::get_root()
     return this->root;
 }
 
-void Syntax_Tree::out()
+void Syntax_Tree::draw_syntax_tree(std::string file_name)
 {
-    std::cout << "root is " << "i = " << this->root->index << "; val = " << this->root->value << ";" << std::endl;
+    /*std::cout << "root is " << "i = " << this->root->index << "; val = " << this->root->value << ";" << std::endl;
  
     for (auto it = this->nodes.begin(); it != this->nodes.end(); it++)
     {
@@ -99,7 +99,25 @@ void Syntax_Tree::out()
         }
 
         std::cout << std::endl;
+    }*/
+    if (this->root == nullptr) return;
+    std::ofstream* out = new std::ofstream(file_name);
+
+    *out << "digraph G {" << std::endl;
+
+    for (auto it = this->nodes.begin(); it != this->nodes.end(); it++)
+    {
+        if ((*it)->left_ptr != nullptr)
+        {
+            *out << "\"" << "id:" << (*it)->index << " " << (*it)->value << "\"" << " -> " << "\"" << "id:" << (*it)->left_ptr->index << " " << (*it)->left_ptr->value << "\"" << std::endl;
+        }
+        if ((*it)->right_ptr != nullptr)
+        {
+            *out << "\"" << "id:" << (*it)->index << " " << (*it)->value << "\"" << " -> " << "\"" << "id:" << (*it)->right_ptr->index << " " << (*it)->right_ptr->value << "\"" << std::endl;
+        }
     }
+
+    *out << "}";
 }
 
 void Syntax_Tree::add_brackets(int open, int close)
@@ -155,14 +173,17 @@ void Syntax_Tree::add_children(int parent_i, int child_i)
 {
 	ST_Node* parent = _get_node(parent_i);
 	
-	if (is_this_bracket(child_i) && _get_bracket_type(child_i) == BT_open)
-	{
-		child_i++;
-	}
-	else if (is_this_bracket(child_i) && _get_bracket_type(child_i) == BT_close)
-	{
-		child_i--;
-	}
+    while(is_this_bracket(child_i)) 
+    {
+	    if (is_this_bracket(child_i) && _get_bracket_type(child_i) == BT_open)
+	    {
+		    child_i++;
+	    }
+	    else if (is_this_bracket(child_i) && _get_bracket_type(child_i) == BT_close)
+	    {
+		    child_i--;
+	    }
+    }
 
 	ST_Node* child = _get_node(child_i);
 

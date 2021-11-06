@@ -1,22 +1,25 @@
 #include "NFA_Builder.h"
 
-NFA_Builder::NFA_Builder()
+NFA_Builder::NFA_Builder(std::string regex)
 {
 	this->start = nullptr;
 	this->recieve = nullptr;
 	this->nfa_nodes_id = 0;
+
+	this->stree = new Syntax_Tree(regex);
+	build(this->stree->get_root());
 }
 
-void NFA_Builder::build(Syntax_Tree* stree, ST_Node* node)
+void NFA_Builder::build(ST_Node* node)
 {
-	if (stree->get_root()->is_checked == 1) return;
+	if (this->stree->get_root()->is_checked == 1) return;
 
 	if (node->left_ptr == nullptr && node->right_ptr == nullptr)
 	{
 		create_graph(node);
 		node->is_checked = 1;
 
-		build(stree, node->parent);
+		build(node->parent);
 	}
 
 	if (node->left_ptr != nullptr && node->right_ptr != nullptr)
@@ -26,11 +29,11 @@ void NFA_Builder::build(Syntax_Tree* stree, ST_Node* node)
 			create_graph(node);
 			node->is_checked = 1;
 
-			build(stree, node->parent);
+			build(node->parent);
 		}
 
-		if (!node->left_ptr->is_checked) build(stree, node->left_ptr);
-		if (!node->right_ptr->is_checked) build(stree, node->right_ptr);
+		if (!node->left_ptr->is_checked) build(node->left_ptr);
+		if (!node->right_ptr->is_checked) build(node->right_ptr);
 	}
 
 	if (node->left_ptr != nullptr && node->right_ptr == nullptr)
@@ -40,9 +43,9 @@ void NFA_Builder::build(Syntax_Tree* stree, ST_Node* node)
 			create_graph(node);
 			node->is_checked = 1;
 
-			build(stree, node->parent);
+			build(node->parent);
 		}
-		else build(stree, node->left_ptr);
+		else build(node->left_ptr);
 	}
 }
 
@@ -89,11 +92,11 @@ void NFA_Builder::create_graph(ST_Node* node)
 		graph_B->enter_node->type = nfa_normal;
 		graph_B->exit_node->type = nfa_normal;
 
-		node_A->make_link(graph_A->enter_node, "epsilon");
-		node_A->make_link(graph_B->enter_node, "epsilon");
+		node_A->make_link(graph_A->enter_node, "eps");
+		node_A->make_link(graph_B->enter_node, "eps");
 
-		graph_A->exit_node->make_link(node_B, "epsilon");
-		graph_B->exit_node->make_link(node_B, "epsilon");
+		graph_A->exit_node->make_link(node_B, "eps");
+		graph_B->exit_node->make_link(node_B, "eps");
 
 		new_graph->enter_node = node_A;
 		new_graph->exit_node = node_B;
@@ -135,9 +138,9 @@ void NFA_Builder::create_graph(ST_Node* node)
 		graph_A->enter_node->type = nfa_normal;
 		graph_A->exit_node->type = nfa_normal;
 
-		node_A->make_link(graph_A->enter_node, "epsilon");
-		graph_A->exit_node->make_link(node_B, "epsilon");
-		graph_A->exit_node->make_link(graph_A->enter_node, "epsilon");
+		node_A->make_link(graph_A->enter_node, "eps");
+		graph_A->exit_node->make_link(node_B, "eps");
+		graph_A->exit_node->make_link(graph_A->enter_node, "eps");
 		
 		new_graph->enter_node = node_A;
 		new_graph->exit_node = node_B;
@@ -152,12 +155,27 @@ void NFA_Builder::create_graph(ST_Node* node)
 	}
 }
 
-void NFA_Builder::draw_graph()
+
+
+void NFA_Builder::draw_syntax_tree(std::string file_name)
+{
+	this->stree->draw_syntax_tree(file_name);
+}
+
+NFA_Node* NFA_Builder::get_graph()
+{
+	return this->start;
+}
+
+void NFA_Builder::draw_graph(std::string file_name)
 {
 	if (this->start == nullptr) return;
 
-	std::ofstream* out = new std::ofstream("graphviz.txt");
+	std::ofstream* out = new std::ofstream(file_name);
 	*out << "digraph G {" << std::endl;
+
+	*out << this->start->id << " [label=\"" << this->start->id << "\\nstart\"];" << std::endl;
+	*out << this->recieve->id << " [label=\"" << this->recieve->id << "\\nrecieve\"];" << std::endl;
 
 	_recursive_drawing(this->start, out);
 

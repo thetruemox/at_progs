@@ -2,6 +2,7 @@
 #include <list>
 #include <string>
 #include <iostream>
+#include <fstream>
 #include "ST_Node.h"
 
 enum bracket_type
@@ -14,7 +15,7 @@ class Syntax_Tree
 public:
 	Syntax_Tree(std::string regex);
 	ST_Node* get_root();
-	void out();
+	void draw_syntax_tree(std::string file_name);
 
 private:
 	void add_brackets(int open, int close);
