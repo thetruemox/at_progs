@@ -139,6 +139,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="DFA_Agent.cpp" />
+    <ClCompile Include="DFA_Builder.cpp" />
+    <ClCompile Include="DFA_Node.cpp" />
     <ClCompile Include="my_regex.cpp" />
     <ClCompile Include="NFA_Builder.cpp" />
     <ClCompile Include="NFA_Graph.cpp" />
@@ -147,6 +150,9 @@
     <ClCompile Include="Syntax_Tree.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="DFA_Agent.h" />
+    <ClInclude Include="DFA_Builder.h" />
+    <ClInclude Include="DFA_Node.h" />
     <ClInclude Include="NFA_Builder.h" />
     <ClInclude Include="NFA_Graph.h" />
     <ClInclude Include="NFA_Node.h" />

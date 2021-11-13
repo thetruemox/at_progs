@@ -16,6 +16,8 @@ void NFA_Builder::build(ST_Node* node)
 
 	if (node->left_ptr == nullptr && node->right_ptr == nullptr)
 	{
+		++(this->abc)[node->value];
+
 		create_graph(node);
 		node->is_checked = 1;
 
@@ -170,12 +172,22 @@ void NFA_Builder::draw_syntax_tree(std::string file_name)
 	this->stree->draw_syntax_tree(file_name);
 }
 
-NFA_Node* NFA_Builder::get_graph()
+NFA_Node* NFA_Builder::get_start()
 {
 	return this->start;
 }
 
-void NFA_Builder::draw_graph(std::string file_name)
+NFA_Node* NFA_Builder::get_recieve()
+{
+	return this->recieve;
+}
+
+std::map<std::string, int> NFA_Builder::get_abc()
+{
+	return this->abc;
+}
+
+void NFA_Builder::draw_nfa_graph(std::string file_name)
 {
 	if (this->start == nullptr) return;
 
