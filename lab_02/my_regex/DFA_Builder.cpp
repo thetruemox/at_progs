@@ -20,7 +20,7 @@ DFA_Builder::DFA_Builder(std::string regex)
     //По итогу имеем 1-го агента, с которого и начнем обработку
 
     DFA_Agent* new_agent;
-    while (1)
+    while (agent != nullptr)
     {
         agent = nullptr;
         //Ищем необработанного агента

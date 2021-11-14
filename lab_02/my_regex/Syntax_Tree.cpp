@@ -2,7 +2,9 @@
 
 Syntax_Tree::Syntax_Tree(std::string regex)
 {
-    std::string reg = "(" + regex + ")";
+    std::string reg = this->rep_parse(regex);
+
+    reg = "(" + reg + ")";
     int first, last;
 
     do
@@ -154,6 +156,142 @@ int Syntax_Tree::is_this_bracket(int index)
 		if ((*iter).first == index) return 1;
 	}
 	return 0;
+}
+
+std::string Syntax_Tree::rep_parse(std::string reg)
+{
+    int op_br_count;
+    int cl_br_count;
+    int r_size;
+
+    std::string new_reg;
+    std::string r;
+
+    std::string* s_ptr;
+    std::string s_low, s_up;
+    int low, up;
+    int comm;
+    int t_i;
+
+    for (int i = 0; i < reg.size(); i++)
+    {
+        if (reg[i] == '{')
+        {
+            //Поиск r
+            t_i = i - 1;
+            op_br_count = 0;
+            cl_br_count = 0;
+            r_size = 0;
+            if (reg[t_i] == ')')
+            {
+                ++cl_br_count;
+                ++r_size;
+                --t_i;
+
+                while (op_br_count != cl_br_count)
+                {
+                    if (reg[t_i] == ')')
+                    {
+                        ++cl_br_count;
+                    }
+                    else if (reg[t_i] == '(')
+                    {
+                        ++op_br_count;
+                    }
+                    ++r_size;
+                    --t_i;
+                }
+
+                r = reg.substr(i - r_size, r_size);
+            }
+            else
+            {
+                r_size = 1;
+                r = reg[t_i];
+            }
+
+            //Поиск s_low, s_up
+            t_i = i + 1;
+            comm = 0;
+            s_ptr = &s_low;
+            while (reg[t_i] != '}')
+            {
+                if (reg[t_i] == ',')
+                {
+                    s_ptr = &s_up;
+                    comm = 1;
+                    ++t_i;
+                    continue;
+                }
+
+                (*s_ptr) += reg[t_i];
+                ++t_i;
+            }
+
+            //Пропуск части с {...} внешним счетчиком
+            i += (2 + s_low.size() + s_up.size() + comm) - 1;
+
+            low = std::stoi(s_low);
+
+            new_reg.erase(new_reg.size() - r_size, r_size);
+
+            new_reg += '(';
+
+            if (low != 0)
+            {
+                new_reg += '(';
+                new_reg += r;
+                for (int i = 0; i < low - 1; i++)
+                {
+                    new_reg += '.';
+                    new_reg += r;
+                }
+                new_reg += ')';
+            }
+            else
+            {
+                new_reg += "(^)";
+            }
+
+            if (s_low.size() != 0 && s_up.size() != 0) //from s_low to s_up
+            {
+                up = std::stoi(s_up);
+                for (int ds = 0; ds < (up - low); ds++)
+                {
+                    new_reg += "|(";
+                    new_reg += r;
+                    for (int t_i = 0; t_i < low + ds; t_i++)
+                    {
+                        new_reg += '.';
+                        new_reg += r;
+                    }
+                    new_reg += ')';
+                }
+            }
+            else if (s_low.size() != 0 && comm == 1 && s_up.size() == 0) //from s_low to inf (^|r+)
+            {
+                new_reg += ".(^|";
+                new_reg += r;
+                new_reg += "+)";
+            }
+            else if (s_low.size() != 0 && comm == 0 && s_up.size() == 0) //from s_low to s_low 
+            {
+                //По сути, этот случай изначально уже обработан
+            }
+            else
+            {
+                //Ошибка
+            }
+
+            new_reg += ')';
+        }
+        else
+        {
+            new_reg += reg[i];
+        }
+    }
+
+    return new_reg;
 }
 
 bracket_type Syntax_Tree::_get_bracket_type(int index)

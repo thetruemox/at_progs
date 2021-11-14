@@ -8,13 +8,14 @@ using namespace std;
 
 int main()
 {
-    string reg = "(a.b.c+)+";
+    string reg = "a{2,3}.b";
+
     DFA_Builder* dfa = new DFA_Builder(reg);
     
     dfa->draw_dfa_graph("dfa.txt");
     dfa->draw_nfa_graph("nfa.txt");
     dfa->draw_syntax_tree("stree.txt");
-    
 
+    
     return 0;
 }

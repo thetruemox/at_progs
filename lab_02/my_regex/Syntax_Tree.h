@@ -24,6 +24,8 @@ private:
 	void add_children(int parent_i, int child_i); 
 	//Поиск самого старшего элемента в поддереве
 
+	std::string rep_parse(std::string reg);
+
 	bracket_type _get_bracket_type(int index);
 	ST_Node* _get_node(int index);
 	stn_type _get_type(int index);
