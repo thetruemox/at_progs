@@ -16,6 +16,8 @@ public:
 	int checked;
 	int id;
 
+	DFA_Node* transition(std::string cond);
+
 	void make_link(DFA_Node* to, std::string cond);
 	std::list<std::pair<DFA_Node*, std::string>> links;
 	//переход куда и по какому условию
