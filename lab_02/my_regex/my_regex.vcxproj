@@ -142,7 +142,8 @@
     <ClCompile Include="DFA_Agent.cpp" />
     <ClCompile Include="DFA_Builder.cpp" />
     <ClCompile Include="DFA_Node.cpp" />
-    <ClCompile Include="my_regex.cpp" />
+    <ClCompile Include="main_fun.cpp" />
+    <ClCompile Include="My_Regex.cpp" />
     <ClCompile Include="NFA_Builder.cpp" />
     <ClCompile Include="NFA_Graph.cpp" />
     <ClCompile Include="NFA_Node.cpp" />
@@ -153,6 +154,7 @@
     <ClInclude Include="DFA_Agent.h" />
     <ClInclude Include="DFA_Builder.h" />
     <ClInclude Include="DFA_Node.h" />
+    <ClInclude Include="My_Regex.h" />
     <ClInclude Include="NFA_Builder.h" />
     <ClInclude Include="NFA_Graph.h" />
     <ClInclude Include="NFA_Node.h" />

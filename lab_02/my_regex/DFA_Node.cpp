@@ -16,6 +16,15 @@ DFA_Node* DFA_Node::transition(std::string cond)
 	return nullptr;
 }
 
+DFA_Node* DFA_Node::transition(char cond)
+{
+	for (auto it = this->links.begin(); it != this->links.end(); it++)
+	{
+		if (((*it).second)[0] == cond) return (*it).first;
+	}
+	return nullptr;
+}
+
 void DFA_Node::make_link(DFA_Node* to, std::string cond)
 {
 	this->links.push_back({ to, cond });

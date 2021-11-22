@@ -89,6 +89,11 @@ DFA_Builder::DFA_Builder(std::string regex)
     this->minimize();
 }
 
+DFA_Node* DFA_Builder::get_min_dfa_graph()
+{
+    return this->min_graph.front();
+}
+
 int DFA_Builder::is_unique(DFA_Agent* new_agent, DFA_Agent* agent, std::string cond)
 {
     int ans = 1;

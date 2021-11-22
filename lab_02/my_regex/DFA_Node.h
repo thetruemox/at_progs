@@ -17,6 +17,7 @@ public:
 	int id;
 
 	DFA_Node* transition(std::string cond);
+	DFA_Node* transition(char cond);
 
 	void make_link(DFA_Node* to, std::string cond);
 	std::list<std::pair<DFA_Node*, std::string>> links;
