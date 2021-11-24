@@ -16,7 +16,7 @@ void NFA_Builder::build(ST_Node* node)
 
 	if (node->left_ptr == nullptr && node->right_ptr == nullptr)
 	{
-		++(this->abc)[node->value];
+		if (node->value != "eps") ++(this->abc)[node->value];	
 
 		create_graph(node);
 		node->is_checked = 1;
@@ -69,7 +69,7 @@ void NFA_Builder::create_graph(ST_Node* node)
 		node_A = new NFA_Node(nfa_start, this->nfa_nodes_id++);
 		node_B = new NFA_Node(nfa_receiving, this->nfa_nodes_id++);
 
-		if (node->value == "^")
+		if (node->value == "eps")
 		{
 			node_A->make_link(node_B, "eps");
 		}

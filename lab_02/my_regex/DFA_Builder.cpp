@@ -89,9 +89,21 @@ DFA_Builder::DFA_Builder(std::string regex)
     this->minimize();
 }
 
-DFA_Node* DFA_Builder::get_min_dfa_graph()
+std::list<DFA_Node*> DFA_Builder::get_min_dfa_graph()
 {
-    return this->min_graph.front();
+    return this->min_graph;
+}
+
+std::list<DFA_Node*> DFA_Builder::get_min_dfa_graph_recieves()
+{
+    std::list<DFA_Node*> recieves;
+
+    for (auto it = this->min_graph.begin(); it != this->min_graph.end(); it++)
+    {
+        if ((*it)->type == dfa_receiving) recieves.push_back((*it));
+    }
+
+    return recieves;
 }
 
 int DFA_Builder::is_unique(DFA_Agent* new_agent, DFA_Agent* agent, std::string cond)
@@ -229,7 +241,7 @@ void DFA_Builder::_recursive_drawing(DFA_Node* node, std::ofstream* out)
 
 void DFA_Builder::minimize()
 {
-    int g_id = 0;
+    int g_id = 1;
     std::list<std::pair<int, std::list<int>*>> splits;
 
     splits.push_back({ g_id++, new std::list<int> });

@@ -10,7 +10,7 @@ enum stn_type
 class ST_Node
 {
 public:
-	ST_Node(char value, int index, stn_type type);
+	ST_Node(std::string value, int index, stn_type type);
 
 	int is_checked;
 

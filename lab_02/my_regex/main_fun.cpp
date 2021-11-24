@@ -8,9 +8,11 @@ using namespace std;
 
 int main()
 {
-    string reg = "(m.e.((o.w)|(p.h.i)))+";
+    string reg = "a|^";
     My_Regex my_regex(reg);
-    cout << my_regex.check_str("1");
+    cout << my_regex.check_str("a") << std::endl;
+    my_regex.restore_regex("rstr_reg.txt");
+
     return 0;
 }
 

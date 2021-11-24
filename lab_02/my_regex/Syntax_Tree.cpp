@@ -323,7 +323,11 @@ stn_type Syntax_Tree::_get_type(int index)
 
 void Syntax_Tree::create_node(char value, int index, stn_type type)
 {
-	this->nodes.push_back(new ST_Node(value, index, type));
+    std::string tmp_str;
+    tmp_str = value;
+    if (value == '^') tmp_str = "eps";
+
+	this->nodes.push_back(new ST_Node(tmp_str, index, type));
 }
 
 void Syntax_Tree::add_children(int parent_i, int child_i)

@@ -1,6 +1,6 @@
 #include "ST_Node.h"
 
-ST_Node::ST_Node(char value, int index, stn_type type)
+ST_Node::ST_Node(std::string value, int index, stn_type type)
 {
 	this->is_checked = 0;
 	this->value = value;
