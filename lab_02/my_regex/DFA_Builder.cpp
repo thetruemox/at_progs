@@ -68,9 +68,9 @@ DFA_Builder::DFA_Builder(std::string regex)
                 delete new_agent;
             }
 
-            agent->checked = 1;
+            
         }
-
+        agent->checked = 1;
     }
     
     this->graph.front()->type = dfa_start;

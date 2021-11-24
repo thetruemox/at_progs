@@ -7,6 +7,7 @@ My_Regex::My_Regex(std::string regex)
     this->dfa_graph_start = this->dfa_graph.front();
     this->dfa_recieves = dfa_builder.get_min_dfa_graph_recieves();
 
+    
     dfa_builder.draw_min_dfa_graph("min_dfa.txt");
     dfa_builder.draw_dfa_graph("dfa.txt");
     dfa_builder.draw_nfa_graph("nfa.txt");
@@ -50,17 +51,18 @@ std::string My_Regex::restore_regex(std::string file_name)
     int i = this->dfa_graph_start->id;
     int j;
     std::string regex;
-
+    
     for (auto it = this->dfa_recieves.begin(); it != this->dfa_recieves.end(); it++)
     {
         j = (*it)->id;
-        regex += _R(k-1, i, j) + "|" + _R(k - 1, i, k) + ".^|(" + _R(k - 1, k, k) + ")+." + _R(k - 1, k, j);
+
+        regex += _R(k, i, j);
         regex += "|";
     }
     regex.erase(regex.size() - 1);
     
     *out << regex;
-
+    
     return regex;
 }
 
@@ -68,16 +70,42 @@ std::string My_Regex::_R(int k, int i, int j)
 {
     std::string regex;
 
+    regex += "(";
+
     if (k > 1)
     {
-        regex += _R(k - 1, i, j) + "|" + _R(k - 1, i, k) + ".^|(" + _R(k - 1, k, k) + ")+." + _R(k - 1, k, j);
+        if (i == k)
+        {
+            regex += _R(k - 1, i, j) + "|(" + _R(k - 1, k, k) + ")+." + _R(k - 1, k, j);
+        }
+        else if (j == k)
+        {
+            regex += _R(k - 1, i, j) + "|(" + _R(k - 1, k, k) + ")+." + _R(k - 1, i, k);
+        }
+        else
+        {
+            regex += _R(k - 1, i, j) + "|" + _R(k - 1, i, k) + ".(^|(" + _R(k - 1, k, k) + ")+)." + _R(k - 1, k, j);
+        }
     } 
     else
     {
-        regex += _null_R(i, j) + "|" + _null_R(i, k) + ".^|(" + _null_R(k, k) + ")+." + _null_R(k, j);
+        if (i == k)
+        {
+            regex += _null_R(i, j) + "|(" + _null_R(k, k) + ")+." + _null_R(k, j);
+        }
+        else if (j == k)
+        {
+            regex += _null_R(i, j) + "|(" + _null_R(k, k) + ")+." + _null_R(i, k);
+        }
+        else
+        {
+            regex += _null_R(i, j) + "|" + _null_R(i, k) + ".(^|(" + _null_R(k, k) + ")+)." + _null_R(k, j);
+        }
     }
 
-    if (regex == "^|^.^|(^)+.^")
+    regex += ")";
+
+    if (regex == "((^)|(^).(^|(^)+).(^))")
     {
         return "^";
     } else return regex;
