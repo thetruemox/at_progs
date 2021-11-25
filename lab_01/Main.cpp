@@ -88,7 +88,7 @@
 using namespace std;
 using namespace statemap;
 
-bool CheckStringRegex(string str)
+bool CheckStringRegex(string str) //todo statistics
 {
     try {
         regex regular("[<][-][a-zA-Z!][a-zA-Z0-9]{0,15}([&|\\||\\^][a-zA-Z!][a-zA-Z0-9]{0,15})*[#]");
@@ -117,13 +117,13 @@ int main(int argc, char *argv[])
 
     if (!fin.is_open()) 
     { 
-        cout << "Can`t open the test.txt!" << endl; 
+        cout << "can`t open the test.txt!" << endl; 
         return -1;
     }
 
     if (!fout.is_open())
     {
-        cout << "Can`t open the time.txt!" << endl;
+        cout << "can`t open the time.txt!" << endl;
         return -2;
     }
 
@@ -134,32 +134,33 @@ int main(int argc, char *argv[])
     bool isAccpetable;
 
     int time_index = 0;
+    int avg_time = 0;
     while (!fin.eof())
     {
         fin >> word;
-    
+        //cin >> word;
         //cout << "The string \"" << word << "\" is ";
 
         try
         {
             start = clock();
            
-            //isAccpetable = thisContext.CheckString(word.c_str());
-            isAccpetable = CheckStringRegex(word);
+            isAccpetable = thisContext.CheckString(word.c_str());
+            //isAccpetable = CheckStringRegex(word);
 
             stop = clock();
 
-            
+            avg_time += (stop - start);
 
             if (isAccpetable)
             {
-                fout << time_index <<" is acceptable, " << "time: " << (stop - start) / CLK_TCK << endl;
+                fout << time_index <<" is acceptable \t" << "time: " << (stop - start)<< endl;
                 ++time_index;
                 //cout << "acceptable" << endl;          
             }
             else
             {
-                fout << time_index << " is not acceptable, " << "time: " << (stop - start) / CLK_TCK << endl;
+                fout << time_index << " is not acceptable\t" << "time: " << (stop - start)<< endl;
                 ++time_index;
                 //cout << "not acceptable" << endl;
             }
@@ -170,7 +171,9 @@ int main(int argc, char *argv[])
         }
     }
 
-    map = thisContext.get_map();
+    cout << "avg_time: " << avg_time << endl;
+
+    //map = thisContext.get_map();
 
     fin.close();
     fout.close();

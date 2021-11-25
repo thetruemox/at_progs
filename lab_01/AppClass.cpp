@@ -96,33 +96,33 @@ bool AppClass::CheckString(const char *theString)
         } else if ((*theString >= 'a' && *theString <= 'z') || (*theString >= 'A' && *theString <= 'Z'))
         {
       
-            if (length > max_length)
-            {
-                _fsm.Unknown();
+            //if (length > max_length)
+            //{
+              //  _fsm.Unknown();
              //   std::cout << "Unknown" << std::endl;
-            }
-            else 
-            {
+           // }
+            //else 
+            //{
                 _fsm.Letter();
                 this->temp_word += *theString;
               //  std::cout << "Letter" << std::endl;
-            }
+            //}
 
         }
         else if (*theString >= '0' && *theString <= '9')
         {
      
-            if (length > max_length)
-            {
-                _fsm.Unknown();
+           // if (length > max_length)
+           // {
+           //     _fsm.Unknown();
                // std::cout << "Unknown" << std::endl;
-            }
-            else
-            {
+           // }
+           // else
+           // {
                 _fsm.Number();
                 this->temp_word += *theString;
                // std::cout << "Number" << std::endl;
-            }
+           // }
         }
         else if (*theString == '!')
         {         
@@ -164,9 +164,7 @@ bool AppClass::CheckString(const char *theString)
 
     if (isAcceptable)
     {
-        std::list<std::string>::iterator list_it = this->word_list.begin();
-
-        for (int i = 0; list_it != this->word_list.end(); list_it++)
+        for (auto list_it = this->word_list.begin(); list_it != this->word_list.end(); list_it++)
         {
             ++map[*list_it];
         }

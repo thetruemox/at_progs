@@ -46,52 +46,52 @@
 
 %map Map1
 %%
-// State		Transition		End State		Action(s)
+// State		Transition	Guard										End State		Action(s)
 Start
 {
-				OpenSymb		S0				{}
+				OpenSymb												S0				{}
 }												 
 												 
 S0												 
 {												 
-				Exc_point		S1				{inc_length();}
-				Letter			S1				{inc_length();}		
+				Exc_point												S1				{inc_length();}
+				Letter		[ctxt.check_length() == true]				S1				{inc_length();}		
 }
 
 S1
 {
-				Letter			S1				{inc_length();}
-				Number			S1				{inc_length();}
-				Math			S0				{reset_length();}
-				Hash			S2				{}
+				Letter		[ctxt.check_length() == true]				S1				{inc_length();}
+				Number		[ctxt.check_length() == true]				S1				{inc_length();}
+				Math													S0				{reset_length();}
+				Hash													S2				{}
 }
 
 S2
 {
-				EOS				OK				{Acceptable(); reset_length();}
+				EOS														OK				{Acceptable(); reset_length();}
 }
 
 OK
 {
-				Epsilon			Start			{reset_length();}
+				Epsilon													Start			{reset_length();}
 }
 
 Error
 {	
-				EOS				nil				{Unacceptable(); reset_length();}
-				Epsilon			Start			{reset_length();}
+				EOS														nil				{Unacceptable(); reset_length();}
+				Epsilon													Start			{reset_length();}
 }
 
 Default
 {
-				OpenSymb		Error			{}
-				Exc_point		Error			{}
-				Letter			Error			{}
-				Number			Error			{}
-				Math			Error			{}
-				Hash			Error			{}
-				Unknown			Error			{}
-				EOS				Error			{}
+				OpenSymb												Error			{}
+				Exc_point												Error			{}
+				Letter													Error			{}
+				Number													Error			{}
+				Math													Error			{}
+				Hash													Error			{}
+				Unknown													Error			{}
+				EOS														Error			{}
 }
 
 %%

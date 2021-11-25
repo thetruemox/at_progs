@@ -473,35 +473,42 @@ void Map1_S0::Letter(AppClassContext& context)
                 << std::endl;
     }
 
-    context.getState().Exit(context);
-    if (context.getDebugFlag())
+    if (ctxt.check_length() == true)
     {
-        std::ostream& str = context.getDebugStream();
-
-        str << "ENTER TRANSITION: Map1::S0::Letter()"
-            << std::endl;
-    }
-
-    context.clearState();
-    try
-    {
-        ctxt.inc_length();
+        context.getState().Exit(context);
         if (context.getDebugFlag())
         {
             std::ostream& str = context.getDebugStream();
 
-            str << "EXIT TRANSITION : Map1::S0::Letter()"
+            str << "ENTER TRANSITION: Map1::S0::Letter()"
                 << std::endl;
         }
 
-        context.setState(Map1::S1);
+        context.clearState();
+        try
+        {
+            ctxt.inc_length();
+            if (context.getDebugFlag())
+            {
+                std::ostream& str = context.getDebugStream();
+
+                str << "EXIT TRANSITION : Map1::S0::Letter()"
+                    << std::endl;
+            }
+
+            context.setState(Map1::S1);
+        }
+        catch (...)
+        {
+            context.setState(Map1::S1);
+            throw;
+        }
+        context.getState().Entry(context);
     }
-    catch (...)
+    else
     {
-        context.setState(Map1::S1);
-        throw;
+         Map1_Default::Letter(context);
     }
-    context.getState().Entry(context);
 
 }
 
@@ -550,35 +557,42 @@ void Map1_S1::Letter(AppClassContext& context)
                 << std::endl;
     }
 
-    context.getState().Exit(context);
-    if (context.getDebugFlag())
+    if (ctxt.check_length() == true)
     {
-        std::ostream& str = context.getDebugStream();
-
-        str << "ENTER TRANSITION: Map1::S1::Letter()"
-            << std::endl;
-    }
-
-    context.clearState();
-    try
-    {
-        ctxt.inc_length();
+        context.getState().Exit(context);
         if (context.getDebugFlag())
         {
             std::ostream& str = context.getDebugStream();
 
-            str << "EXIT TRANSITION : Map1::S1::Letter()"
+            str << "ENTER TRANSITION: Map1::S1::Letter()"
                 << std::endl;
         }
 
-        context.setState(Map1::S1);
+        context.clearState();
+        try
+        {
+            ctxt.inc_length();
+            if (context.getDebugFlag())
+            {
+                std::ostream& str = context.getDebugStream();
+
+                str << "EXIT TRANSITION : Map1::S1::Letter()"
+                    << std::endl;
+            }
+
+            context.setState(Map1::S1);
+        }
+        catch (...)
+        {
+            context.setState(Map1::S1);
+            throw;
+        }
+        context.getState().Entry(context);
     }
-    catch (...)
+    else
     {
-        context.setState(Map1::S1);
-        throw;
+         Map1_Default::Letter(context);
     }
-    context.getState().Entry(context);
 
 }
 
@@ -638,35 +652,42 @@ void Map1_S1::Number(AppClassContext& context)
                 << std::endl;
     }
 
-    context.getState().Exit(context);
-    if (context.getDebugFlag())
+    if (ctxt.check_length() == true)
     {
-        std::ostream& str = context.getDebugStream();
-
-        str << "ENTER TRANSITION: Map1::S1::Number()"
-            << std::endl;
-    }
-
-    context.clearState();
-    try
-    {
-        ctxt.inc_length();
+        context.getState().Exit(context);
         if (context.getDebugFlag())
         {
             std::ostream& str = context.getDebugStream();
 
-            str << "EXIT TRANSITION : Map1::S1::Number()"
+            str << "ENTER TRANSITION: Map1::S1::Number()"
                 << std::endl;
         }
 
-        context.setState(Map1::S1);
+        context.clearState();
+        try
+        {
+            ctxt.inc_length();
+            if (context.getDebugFlag())
+            {
+                std::ostream& str = context.getDebugStream();
+
+                str << "EXIT TRANSITION : Map1::S1::Number()"
+                    << std::endl;
+            }
+
+            context.setState(Map1::S1);
+        }
+        catch (...)
+        {
+            context.setState(Map1::S1);
+            throw;
+        }
+        context.getState().Entry(context);
     }
-    catch (...)
+    else
     {
-        context.setState(Map1::S1);
-        throw;
+         Map1_Default::Number(context);
     }
-    context.getState().Entry(context);
 
 }
 

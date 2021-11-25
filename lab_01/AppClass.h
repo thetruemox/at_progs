@@ -94,6 +94,14 @@ public:
     {
         this->length = 0;
     };
+    inline int check_length()
+    {
+        if (this->length > this->max_length)
+        {
+            return 0;
+        }
+        else return 1;
+    };
 
     inline std::map<std::string, int> get_map()
     {

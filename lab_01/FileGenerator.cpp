@@ -1,8 +1,6 @@
 #include "FileGenerator.h"
-#define MAX_STRINGS 1
-#define MAX_VARS 100
-
-
+#define MAX_STRINGS 20
+#define MAX_VARS 150
 
 int FileGenerator::rand_num(int first, int last)
 {
@@ -20,6 +18,12 @@ void FileGenerator::generate(std::string file_name)
 	for (int i = 0; i < MAX_STRINGS; i++)
 	{
 		fout << "<-";
+		/*if (rand_num(1, 20) != 1) fout << "<-";
+		
+		if (rand_num(1,10) == 1)
+		{
+			fout << rand_num(0, 9);
+		}*/
 
 		for (int j = 0; j < MAX_VARS; j++)
 		{
@@ -30,6 +34,11 @@ void FileGenerator::generate(std::string file_name)
 				temp = 'a' + this->rand_num(0, 'z' - 'a');
 				fout << temp;
 			}
+
+			/*if (rand_num(1, 100) == 1)
+			{
+				fout << "abfgyfhstrfghbgkj";
+			}*/
 
 			if (j != MAX_VARS - 1) fout << '&';	
 		}
