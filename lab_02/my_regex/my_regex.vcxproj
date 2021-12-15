@@ -139,6 +139,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Capture_Groups.cpp" />
+    <ClCompile Include="CG_Unit.cpp" />
     <ClCompile Include="DFA_Agent.cpp" />
     <ClCompile Include="DFA_Builder.cpp" />
     <ClCompile Include="DFA_Node.cpp" />
@@ -151,6 +153,8 @@
     <ClCompile Include="Syntax_Tree.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Capture_Groups.h" />
+    <ClInclude Include="CG_Unit.h" />
     <ClInclude Include="DFA_Agent.h" />
     <ClInclude Include="DFA_Builder.h" />
     <ClInclude Include="DFA_Node.h" />

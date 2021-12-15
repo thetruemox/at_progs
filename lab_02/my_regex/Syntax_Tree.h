@@ -1,9 +1,11 @@
 #pragma once
 #include <list>
+#include <vector>
 #include <string>
 #include <iostream>
 #include <fstream>
 #include "ST_Node.h"
+#include "Capture_Groups.h"
 
 enum bracket_type
 {
@@ -17,6 +19,8 @@ public:
 	ST_Node* get_root();
 	void draw_syntax_tree(std::string file_name);
 
+	Capture_Groups* get_CG() {return this->CG;}
+
 private:
 	void add_brackets(int open, int close);
 	int is_this_bracket(int index);
@@ -25,6 +29,7 @@ private:
 	//Поиск самого старшего элемента в поддереве
 
 	std::string rep_parse(std::string reg);
+	std::string cg_parse(std::string reg);
 
 	bracket_type _get_bracket_type(int index);
 	ST_Node* _get_node(int index);
@@ -34,4 +39,5 @@ private:
 	std::list<ST_Node*> nodes;
 	std::list<std::pair<int, bracket_type>> brackets;
 	ST_Node* root;
+	Capture_Groups* CG;
 };

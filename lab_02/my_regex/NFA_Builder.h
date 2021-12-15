@@ -15,6 +15,7 @@ public:
 
 	NFA_Node* get_start();
 	NFA_Node* get_recieve();
+	Capture_Groups* get_CG();
 
 	std::map<std::string, int> get_abc();
 private:
@@ -25,11 +26,15 @@ private:
 	std::list<NFA_Graph*> graphs;
 	std::map<std::string, int> abc;
 
+	Capture_Groups* CG;
+
+
 	//Макнотон-Ямада-Томпсон 
 	void build(ST_Node* node); 
 	void create_graph(ST_Node* node);
 
 	void _recursive_drawing(NFA_Node* node, std::ofstream* out);
 	NFA_Graph* find_graph(int index);
+	void cg_around_graph(NFA_Node* A, NFA_Node* B, CG_Unit* unit);
 };
 

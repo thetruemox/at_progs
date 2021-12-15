@@ -11,6 +11,7 @@ public:
 	DFA_Builder(std::string regex);
 	std::list<DFA_Node*> get_min_dfa_graph();
 	std::list<DFA_Node*> get_min_dfa_graph_recieves();
+	Capture_Groups* get_CG();
 
 	void draw_min_dfa_graph(std::string file_name);
 	void draw_dfa_graph(std::string file_name);
@@ -35,5 +36,6 @@ private:
 	std::list<DFA_Agent*> agents;
 	std::list<DFA_Node*> graph;
 	std::list<DFA_Node*> min_graph;
+	Capture_Groups* CG;
 };
 

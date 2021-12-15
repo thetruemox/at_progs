@@ -3,6 +3,7 @@
 DFA_Builder::DFA_Builder(std::string regex)
 {
     this->nfa_builder = new NFA_Builder(regex);
+    this->CG = this->nfa_builder->get_CG();
     this->abc = nfa_builder->get_abc();
 
     int id = 0;
@@ -86,6 +87,22 @@ DFA_Builder::DFA_Builder(std::string regex)
         }
     }
 
+    //Заполнение групп захвата
+    for (auto u_it = this->CG->units.begin(); u_it != this->CG->units.end(); u_it++)
+    {
+        for (auto ag_it = this->agents.begin(); ag_it != this->agents.end(); ag_it++)
+        {
+            for (auto set_it = (*ag_it)->set_of_states.begin(); set_it != (*ag_it)->set_of_states.end(); set_it++)
+            {  
+                if ((*u_it).contains(0, (*set_it)->id))
+                {
+                    (*u_it).DFA_arr.push_back((*ag_it)->id);
+                    break;
+                }            
+            }
+        }
+    }
+
     this->minimize();
 }
 
@@ -104,6 +121,11 @@ std::list<DFA_Node*> DFA_Builder::get_min_dfa_graph_recieves()
     }
 
     return recieves;
+}
+
+Capture_Groups* DFA_Builder::get_CG()
+{
+    return this->CG;
 }
 
 int DFA_Builder::is_unique(DFA_Agent* new_agent, DFA_Agent* agent, std::string cond)
@@ -331,6 +353,22 @@ void DFA_Builder::minimize()
             (*it_mg)->type = t_node->type;
         }   
         ++it_mg;
+    }
+
+    //Заполнение групп захвата
+    for (auto u_it = this->CG->units.begin(); u_it != this->CG->units.end(); u_it++)
+    {
+        for (auto it_s = splits.begin(); it_s != splits.end(); it_s++)
+        {
+            for (auto spl = (*it_s).second->begin(); spl != (*it_s).second->end(); spl++)
+            {
+                if ((*u_it).contains(1, (*spl)))
+                {
+                    (*u_it).Min_DFA_arr.push_back((*it_s).first);
+                    break;
+                }
+            }
+        }
     }
 }
 

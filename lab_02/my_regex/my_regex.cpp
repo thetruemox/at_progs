@@ -3,6 +3,8 @@
 My_Regex::My_Regex(std::string regex)
 {
     DFA_Builder dfa_builder(regex);
+
+    this->CG = dfa_builder.get_CG();
     this->dfa_graph = dfa_builder.get_min_dfa_graph();
     this->dfa_graph_start = this->dfa_graph.front();
     this->dfa_recieves = dfa_builder.get_min_dfa_graph_recieves();
@@ -18,12 +20,14 @@ int My_Regex::check_str(std::string str)
 {
     DFA_Node* cur_node = this->dfa_graph_start;
     DFA_Node* next_node = nullptr;
+    //CG_Unit* last_unit = &(this->CG->units.front());
 
     for (int i = 0; i < str.length(); i++)
     {
         next_node = cur_node->transition(str[i]);
         if (next_node != nullptr)
         {
+            //CG->capture(cur_node->id, next_node->id, str[i], last_unit);
             cur_node = next_node;
         }
         else 
@@ -33,6 +37,48 @@ int My_Regex::check_str(std::string str)
         }
     }
     
+    /*for (auto u_it = this->CG->units.begin(); u_it != this->CG->units.end(); u_it++)
+    {
+        std::cout << (*u_it).cap_str << " ";
+    }*/
+
+    if (cur_node->type == dfa_receiving)
+    {
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
+}
+
+int My_Regex::check_str(std::string str, std::map<int, std::string> &capture)
+{
+    DFA_Node* cur_node = this->dfa_graph_start;
+    DFA_Node* next_node = nullptr;
+    CG_Unit* last_unit = &(this->CG->units.front());
+
+    for (int i = 0; i < str.length(); i++)
+    {
+        next_node = cur_node->transition(str[i]);
+        if (next_node != nullptr)
+        {
+            CG->capture(cur_node->id, next_node->id, str[i], last_unit);
+
+            cur_node = next_node;
+        }
+        else
+        {
+            std::cout << "There is no transition: " << str[i] << std::endl;
+            return 0;
+        }
+    }
+
+    for (auto u_it = this->CG->units.begin(); u_it != this->CG->units.end(); u_it++)
+    {
+        capture[(*u_it).CG_num] = (*u_it).cap_str;
+    }
+
     if (cur_node->type == dfa_receiving)
     {
         return 1;
@@ -69,50 +115,73 @@ std::string My_Regex::restore_regex(std::string file_name)
 std::string My_Regex::_R(int k, int i, int j)
 {
     std::string regex;
-
-    regex += "(";
+    std::string tmp_ij, tmp_ik, tmp_kk, tmp_kj;
 
     if (k > 1)
     {
-        if (i == k)
-        {
-            regex += _R(k - 1, i, j) + "|(" + _R(k - 1, k, k) + ")+." + _R(k - 1, k, j);
-        }
-        else if (j == k)
-        {
-            regex += _R(k - 1, i, j) + "|(" + _R(k - 1, k, k) + ")+." + _R(k - 1, i, k);
-        }
-        else
-        {
-            regex += _R(k - 1, i, j) + "|" + _R(k - 1, i, k) + ".(^|(" + _R(k - 1, k, k) + ")+)." + _R(k - 1, k, j);
-        }
+        tmp_ij = _R(k - 1, i, j);
+        tmp_ik = _R(k - 1, i, k);
+        tmp_kk = _R(k - 1, k, k);
+        tmp_kj = _R(k - 1, k, j);
     } 
     else
     {
-        if (i == k)
-        {
-            regex += _null_R(i, j) + "|(" + _null_R(k, k) + ")+." + _null_R(k, j);
-        }
-        else if (j == k)
-        {
-            regex += _null_R(i, j) + "|(" + _null_R(k, k) + ")+." + _null_R(i, k);
-        }
-        else
-        {
-            regex += _null_R(i, j) + "|" + _null_R(i, k) + ".(^|(" + _null_R(k, k) + ")+)." + _null_R(k, j);
-        }
+        tmp_ij = _null_R(i, j);
+        tmp_ik = _null_R(i, k);
+        tmp_kk = _null_R(k, k);
+        tmp_kj = _null_R(k, j);
     }
 
-    regex += ")";
-
-    if (regex == "((^)|(^).(^|(^)+).(^))")
+    if (tmp_ij == (tmp_ik + tmp_kk + tmp_kj))
     {
-        return "^";
-    } else return regex;
+        regex = tmp_ij;
+        if (regex.size()) regex = "(" + regex + ")";
+        return regex;
+    }
+
+    if (tmp_ij.size())
+    {
+        regex += tmp_ij + "|";
+    }
+
+    /*if (!tmp_ik.size() || !tmp_kk.size() || !tmp_kj.size())
+    {
+        if (regex.size())
+        {
+            regex.erase(regex.size() - 1);
+        }
+        return regex;
+    }*/
+
+    if (tmp_ik.size())
+    {
+        regex += tmp_ik + ".";
+    }
+
+    if (tmp_kk.size() && tmp_kk != "^")
+    {
+        regex += "(^|" + tmp_kk + "+).";
+    }
+
+    if (tmp_kj.size())
+    {
+        regex += tmp_kj;
+    }
+    
+    if (regex.size() && (regex[regex.size() - 1] == '.' || regex[regex.size() - 1] == '|'))
+    {
+        regex.erase(regex.size() - 1);
+    }
+    
+    if (regex.size()) regex = "(" + regex + ")";
+
+    return regex;
 }
 
 std::string My_Regex::_null_R(int i, int j)
 {
+    if (i == j) return "";
+
     std::string tmp_r;
 
     DFA_Node* i_node = get_node(i);
@@ -122,19 +191,25 @@ std::string My_Regex::_null_R(int i, int j)
     {
         if ((*it).first->id == j_node->id)
         {
-            tmp_r += (*it).second + ".";
+            tmp_r += (*it).second + "|";
         }
     }
-
+    //если переход i в i то всегда подходит ^
+    //если нет перехода, то не возвращай ^
     if (tmp_r.size() == 0)
     {
-        tmp_r = "^";
+        tmp_r = "";
     }
     else
     {
         tmp_r.erase(tmp_r.size() - 1);
     }
         
+    if (tmp_r.size() > 1)
+    {
+        tmp_r = "(" + tmp_r + ")";
+    }
+
     return tmp_r;
 }
 

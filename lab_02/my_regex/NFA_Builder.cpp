@@ -7,7 +7,17 @@ NFA_Builder::NFA_Builder(std::string regex)
 	this->nfa_nodes_id = 0;
 
 	this->stree = new Syntax_Tree(regex);
+	this->CG = stree->get_CG();
+
 	build(this->stree->get_root());
+
+	//Заполнение групп захвата
+	NFA_Graph* temp_graph;
+	for (auto u_it = this->CG->units.begin(); u_it != this->CG->units.end(); u_it++)
+	{
+		temp_graph = this->find_graph((*u_it).stree_node_id);
+		this->cg_around_graph(temp_graph->enter_node, temp_graph->exit_node, &(*u_it));
+	}
 }
 
 void NFA_Builder::build(ST_Node* node)
@@ -128,7 +138,7 @@ void NFA_Builder::create_graph(ST_Node* node)
 
 		graph_A->exit_node->links = graph_B->enter_node->links;
 		graph_B->delete_node(graph_B->enter_node);
-		graph_B->enter_node = nullptr;
+		graph_B->enter_node = graph_A->exit_node;
 
 		new_graph->enter_node = graph_A->enter_node;
 		new_graph->exit_node = graph_B->exit_node;
@@ -182,6 +192,11 @@ NFA_Node* NFA_Builder::get_recieve()
 	return this->recieve;
 }
 
+Capture_Groups* NFA_Builder::get_CG()
+{
+	return this->CG;
+}
+
 std::map<std::string, int> NFA_Builder::get_abc()
 {
 	return this->abc;
@@ -227,3 +242,25 @@ NFA_Graph* NFA_Builder::find_graph(int index)
 
 	return nullptr;
 }
+
+void NFA_Builder::cg_around_graph(NFA_Node* A, NFA_Node* B, CG_Unit* unit)
+{
+	if (A == B)
+	{
+		if (!unit->saw_it(B->id)) unit->NFA_arr.push_back(B->id);
+		return;
+	}
+
+	if (!unit->saw_it(A->id))
+	{
+		unit->NFA_arr.push_back(A->id);
+
+		for (auto it = A->links.begin(); it != A->links.end(); it++)
+		{
+			cg_around_graph((*it).first, B, unit);
+		}
+	}
+	
+	return;
+}
+

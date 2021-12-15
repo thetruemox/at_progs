@@ -1,13 +1,11 @@
 digraph G {
-6 [label="6\nstart"];
-7 [label="7\nrecieve"];
-6 -> 4[label="eps"];
-4 -> 0[label="eps"];
-4 -> 2[label="eps"];
-0 -> 1[label="a"];
-1 -> 5[label="eps"];
-5 -> 7[label="eps"];
-5 -> 4[label="eps"];
-2 -> 3[label="b"];
+0 [label="0\nstart"];
+9 [label="9\nrecieve"];
+0 -> 1[label="m"];
+1 -> 2[label="eps"];
+2 -> 3[label="e"];
 3 -> 5[label="eps"];
+3 -> 2[label="eps"];
+5 -> 7[label="p"];
+7 -> 9[label="o"];
 }

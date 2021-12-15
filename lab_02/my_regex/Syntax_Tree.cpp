@@ -2,7 +2,11 @@
 
 Syntax_Tree::Syntax_Tree(std::string regex)
 {
-    std::string reg = this->rep_parse(regex);
+    std::string reg = regex;
+    this->CG = new Capture_Groups();
+
+    reg = this->rep_parse(reg);
+    reg = this->cg_parse(reg);
 
     reg = "(" + reg + ")";
     int first, last;
@@ -87,6 +91,18 @@ Syntax_Tree::Syntax_Tree(std::string regex)
     } while (first != -1 && last != -1);
    
     this->root = _get_root();
+
+    //Заполнение групп захвата
+    ST_Node* stn_temp;
+    for (auto u_it = this->CG->units.begin(); u_it != this->CG->units.end(); u_it++)
+    {
+        stn_temp = this->_get_node((*u_it).stree_min_id);
+        while (stn_temp->parent != nullptr && stn_temp->parent->index > (*u_it).stree_min_id && stn_temp->parent->index < (*u_it).stree_max_id)
+        {
+            stn_temp = stn_temp->parent;
+        }
+        (*u_it).stree_node_id = stn_temp->index;
+    }
 }
 
 ST_Node* Syntax_Tree::get_root()
@@ -292,6 +308,66 @@ std::string Syntax_Tree::rep_parse(std::string reg)
     }
 
     return new_reg;
+}
+
+std::string Syntax_Tree::cg_parse(std::string reg)
+{
+    std::string nreg = reg;
+    int cg_start, cg_end;
+    std::string cg_num;
+    int br_count;
+
+    int next_cg_size;
+    int t_i;
+
+    for (int i = 0; i < nreg.length(); i++)
+    {
+        if (nreg[i] == ':')
+        {
+            cg_num = "";
+            
+            cg_start = i;
+            cg_end = i;
+
+            while (nreg[cg_start - 1] != '(') --cg_start;       
+
+            for (int j = cg_start; j < cg_end; j++)
+            {
+                cg_num += nreg[j];
+            }
+
+            nreg.erase(cg_start, cg_end - cg_start + 1);
+            i -= cg_end - cg_start + 1;
+
+            t_i = 1;
+            br_count = 1;
+            next_cg_size = 0;
+            while (br_count != 0)
+            {                
+                if (nreg[cg_end] == ':')
+                {
+                    ++next_cg_size;
+                    while (nreg[cg_end - t_i] != '(')
+                    {
+                        ++next_cg_size;
+                        ++t_i;
+                    }
+                }
+
+                if (nreg[cg_end] == ')')
+                {
+                    --br_count;
+                }
+                else if (nreg[cg_end] == '(') ++br_count;
+
+                ++cg_end;
+            }
+
+            this->CG->add_unit(std::stoi(cg_num), cg_start + 1, cg_end + 1 - next_cg_size);
+        }
+    }
+
+    return nreg;
 }
 
 bracket_type Syntax_Tree::_get_bracket_type(int index)
