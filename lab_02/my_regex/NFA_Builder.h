@@ -9,10 +9,12 @@ class NFA_Builder
 {
 public:
 	NFA_Builder(std::string regex);
-	
+	NFA_Builder(Syntax_Tree* stree);
+
 	void draw_nfa_graph(std::string file_name);
 	void draw_syntax_tree(std::string file_name);
 
+	Syntax_Tree* get_stree();
 	NFA_Node* get_start();
 	NFA_Node* get_recieve();
 	Capture_Groups* get_CG();

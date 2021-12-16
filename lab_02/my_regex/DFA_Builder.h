@@ -9,9 +9,12 @@ class DFA_Builder
 {
 public:
 	DFA_Builder(std::string regex);
+	DFA_Builder(NFA_Builder* nfa_builder);
+
 	std::list<DFA_Node*> get_min_dfa_graph();
 	std::list<DFA_Node*> get_min_dfa_graph_recieves();
 	Capture_Groups* get_CG();
+	NFA_Builder* get_nfa_builder();
 
 	void draw_min_dfa_graph(std::string file_name);
 	void draw_dfa_graph(std::string file_name);
@@ -20,6 +23,8 @@ public:
 
 private:
 	NFA_Builder* nfa_builder;
+
+	void build();
 
 	DFA_Node* get_node(int id);
 	DFA_Node* get_front();

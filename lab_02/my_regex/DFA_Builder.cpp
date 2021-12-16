@@ -4,19 +4,32 @@ DFA_Builder::DFA_Builder(std::string regex)
 {
     this->nfa_builder = new NFA_Builder(regex);
     this->CG = this->nfa_builder->get_CG();
-    this->abc = nfa_builder->get_abc();
+    this->abc = this->nfa_builder->get_abc();
 
+    build();
+}
+
+DFA_Builder::DFA_Builder(NFA_Builder* nfa_builder)
+{
+    this->nfa_builder = nfa_builder;
+    this->CG = this->nfa_builder->get_CG();
+    this->abc = this->nfa_builder->get_abc();
+
+    build();
+}
+
+void DFA_Builder::build()
+{
     int id = 0;
-    this->abc = abc;
 
     //ѕроверка стартового состо€ни€
-	DFA_Agent* agent = new DFA_Agent(id++);
+    DFA_Agent* agent = new DFA_Agent(id++);
     agent->set_of_states.push_back(this->nfa_builder->get_start());
     for (auto it = agent->set_of_states.begin(); it != agent->set_of_states.end(); it++)
     {
         z_eps(agent, (*it));
     }
-	this->agents.push_back(agent);
+    this->agents.push_back(agent);
     this->graph.push_back(new DFA_Node(agent->id));
     //ѕо итогу имеем 1-го агента, с которого и начнем обработку
 
@@ -69,11 +82,11 @@ DFA_Builder::DFA_Builder(std::string regex)
                 delete new_agent;
             }
 
-            
+
         }
         agent->checked = 1;
     }
-    
+
     this->graph.front()->type = dfa_start;
 
     for (auto ag_it = this->agents.begin(); ag_it != this->agents.end(); ag_it++)
@@ -93,12 +106,12 @@ DFA_Builder::DFA_Builder(std::string regex)
         for (auto ag_it = this->agents.begin(); ag_it != this->agents.end(); ag_it++)
         {
             for (auto set_it = (*ag_it)->set_of_states.begin(); set_it != (*ag_it)->set_of_states.end(); set_it++)
-            {  
+            {
                 if ((*u_it).contains(0, (*set_it)->id))
                 {
                     (*u_it).DFA_arr.push_back((*ag_it)->id);
                     break;
-                }            
+                }
             }
         }
     }
@@ -126,6 +139,11 @@ std::list<DFA_Node*> DFA_Builder::get_min_dfa_graph_recieves()
 Capture_Groups* DFA_Builder::get_CG()
 {
     return this->CG;
+}
+
+NFA_Builder* DFA_Builder::get_nfa_builder()
+{
+    return this->nfa_builder;
 }
 
 int DFA_Builder::is_unique(DFA_Agent* new_agent, DFA_Agent* agent, std::string cond)

@@ -20,6 +20,25 @@ NFA_Builder::NFA_Builder(std::string regex)
 	}
 }
 
+NFA_Builder::NFA_Builder(Syntax_Tree* stree)
+{
+	this->start = nullptr;
+	this->recieve = nullptr;
+	this->nfa_nodes_id = 0;
+	this->stree = stree;
+	this->CG = stree->get_CG();
+
+	build(this->stree->get_root());
+
+	//Заполнение групп захвата
+	NFA_Graph* temp_graph;
+	for (auto u_it = this->CG->units.begin(); u_it != this->CG->units.end(); u_it++)
+	{
+		temp_graph = this->find_graph((*u_it).stree_node_id);
+		this->cg_around_graph(temp_graph->enter_node, temp_graph->exit_node, &(*u_it));
+	}
+}
+
 void NFA_Builder::build(ST_Node* node)
 {
 	if (this->stree->get_root()->is_checked == 1) return;
@@ -180,6 +199,11 @@ void NFA_Builder::create_graph(ST_Node* node)
 void NFA_Builder::draw_syntax_tree(std::string file_name)
 {
 	this->stree->draw_syntax_tree(file_name);
+}
+
+Syntax_Tree* NFA_Builder::get_stree()
+{
+	return this->stree;
 }
 
 NFA_Node* NFA_Builder::get_start()
