@@ -1,32 +1,108 @@
 %{
-#include <time.h>
-FILE *out;
-extern FILE * yyin;
-int num = 0, res;
-int start, stop;
-%}
-%%
-[<][-][a-zA-Z!][a-zA-Z0-9]{0,15}([&|\||\^][a-zA-Z!][a-zA-Z0-9]{0,15})*[#]	{return 1;}
-[!][q] {return 0;}
-%%
-int main() {
-printf("Working...\n");
+#include <stdio.h>
+#include <string.h>
 
-yyin = fopen("test.txt", "r");
-out = fopen("yyout.txt", "w");
+FILE *out, *in;
+int size = 0;
+char cc[16];
 
-while(1)
+static void printVar(const char * varName)
 {
-start = clock();
-res = yylex();
-stop = clock();
+	out = fopen("newyyout.txt", "a+");
+	fprintf(out, "%s\n", varName);
+	fclose(out);
+}
+char* f_readln(FILE* file)
+{
 
-if (!res) break;
-fprintf(out, "%d ", num);
-fprintf(out, "time: %d", (stop - start) / CLK_TCK);
-num++;
+    char* ptr = (char*)malloc(1 * sizeof(char*));
+    //*ptr = NULL;
+    char buf[10];
+    int n, len = 0;
+    do {
+        n = fscanf(file, "%9[^\n]", buf);
+        if (n == -1)
+        {
+            return NULL;
+        }
+        if (n == 0)
+            fscanf(file, "%*c");
+        else
+        {
+            len = len + strlen(buf) + 1;
+            ptr = (char*)realloc(ptr, len);
+            strcat(ptr, buf);
+        }
+
+    } while (n > 0);
+    if (ptr[0] == '\0') ptr = NULL;
+
+    return ptr;
+}
+static void countVar()
+{	
+	FILE* in = fopen("newyyout.txt", "r");
+	char** arr = (char**)malloc(size * sizeof(char*));
+	char** t_arr = (char**)malloc(size * sizeof(char*));
+	for (int i = 0; i < size; i++)
+	{
+		arr[i] = (char*)malloc(16 * sizeof(char));
+		t_arr[i] = (char*)malloc(16 * sizeof(char));
+	}
+
+	for (int i = 0; i < size; i++)
+	{
+		arr[i] = f_readln(in);
+		strcpy(t_arr[i], arr[i]);
+	}
+
+	fclose(in);
+
+	//printf("size: %d\n", size);
+	int tmp_c;
+	for (int i = 0; i < size; i++)
+	{
+		tmp_c = 0;
+		for (int j = 0; j < size; j++)
+		{
+			if (strcmp(arr[i], t_arr[j]) == 0)
+			{
+				tmp_c++;
+				free(t_arr[j]);
+			}
+		}
+		if (tmp_c != 0) printf("%s repeats %d times\n", arr[i], tmp_c);
+	}
 }
 
-printf("Job`s done!\n");
+%}
+REG_BEGIN [<][-]
+VAR [a-zA-Z!][a-zA-Z0-9]{0,15}
+EXP [&|\||\^]?
+%x REG
+%x PRS
+%%
+{REG_BEGIN} {yyless(0); BEGIN(REG);}
+<REG>[<][-][a-zA-Z!][a-zA-Z0-9]{0,15}([&|\||\^][a-zA-Z!][a-zA-Z0-9]{0,15})*[#] {printf("Correct: %s\n",yytext); yyless(0); BEGIN(PRS);}
+<REG>.	{REJECT;}
+<PRS>"<-"	{}	
+<PRS>{VAR} 	{printVar(yytext); size++;}
+<PRS>{EXP}	{}
+<PRS>"#" 	{countVar(); BEGIN(INITIAL);}
+%%
+int main() {
+out = fopen("newyyout.txt", "w");
+fclose(out);
+
+yylex();
+
+/*
+<REG>.	{REJECT;}
+<PRS>"<-"	{printf("OPEN\n");}	
+<PRS>{VAR} 	{printf("VAR: %s\n", yytext); printVar(yytext);}
+<PRS>{EXP}	{printf("EXP: %s\n", yytext);}
+<PRS>"#" 	{countVar(); BEGIN(INITIAL);}
+*/
+
 return 0;
 }
