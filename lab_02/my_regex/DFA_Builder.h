@@ -14,6 +14,7 @@ public:
 	std::list<DFA_Node*> get_min_dfa_graph();
 	std::list<DFA_Node*> get_min_dfa_graph_recieves();
 	Capture_Groups* get_CG();
+	std::map<std::string, int> get_abc();
 	NFA_Builder* get_nfa_builder();
 
 	void draw_min_dfa_graph(std::string file_name);

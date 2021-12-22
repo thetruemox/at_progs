@@ -95,7 +95,10 @@ void DFA_Builder::build()
         {
             if ((*set_it)->id == this->nfa_builder->get_recieve()->id)
             {
-                this->get_node((*ag_it)->id)->type = dfa_receiving;
+                if (this->get_node((*ag_it)->id)->type == dfa_start)
+                {
+                    this->get_node((*ag_it)->id)->type = dfa_start_and_receiving;
+                } else this->get_node((*ag_it)->id)->type = dfa_receiving;        
             }
         }
     }
@@ -130,7 +133,7 @@ std::list<DFA_Node*> DFA_Builder::get_min_dfa_graph_recieves()
 
     for (auto it = this->min_graph.begin(); it != this->min_graph.end(); it++)
     {
-        if ((*it)->type == dfa_receiving) recieves.push_back((*it));
+        if ((*it)->type == dfa_receiving || (*it)->type == dfa_start_and_receiving) recieves.push_back((*it));
     }
 
     return recieves;
@@ -139,6 +142,11 @@ std::list<DFA_Node*> DFA_Builder::get_min_dfa_graph_recieves()
 Capture_Groups* DFA_Builder::get_CG()
 {
     return this->CG;
+}
+
+std::map<std::string, int> DFA_Builder::get_abc()
+{
+    return this->abc;
 }
 
 NFA_Builder* DFA_Builder::get_nfa_builder()
@@ -220,6 +228,10 @@ void DFA_Builder::draw_min_dfa_graph(std::string file_name)
         {
             *out << (*it_mg)->id << " [label=\"" << (*it_mg)->id << "\\nrecieve\"];" << std::endl;
         }
+        else if ((*it_mg)->type == dfa_start_and_receiving)
+        {
+            *out << (*it_mg)->id << " [label=\"" << (*it_mg)->id << "\\nstart and recieve\"];" << std::endl;
+        }
 
         for (auto it_nl = (*it_mg)->links.begin(); it_nl != (*it_mg)->links.end(); it_nl++)
         {
@@ -287,7 +299,7 @@ void DFA_Builder::minimize()
     splits.push_back({ g_id++, new std::list<int> });
     for (auto it = this->graph.begin(); it != this->graph.end(); it++)
     {
-        if ((*it)->type == dfa_normal || (*it)->type == dfa_start)
+        if ((*it)->type == dfa_normal || (*it)->type == dfa_start || (*it)->type == dfa_start_and_receiving)
         {
             splits.back().second->push_back((*it)->id);
         }
@@ -300,6 +312,11 @@ void DFA_Builder::minimize()
         {
             splits.back().second->push_back((*it)->id);
         }
+    }
+
+    if (splits.back().second->size() == 0)
+    {
+        splits.pop_back();
     }
 
     int prev_group, cur_group;
@@ -368,8 +385,9 @@ void DFA_Builder::minimize()
         for (auto it_nl = t_node->links.begin(); it_nl != t_node->links.end(); it_nl++)
         {
             (*it_mg)->make_link(this->get_mg_node(this->_find_group((*it_nl).first->id, &splits)), (*it_nl).second);      
-            (*it_mg)->type = t_node->type;
+            //(*it_mg)->type = t_node->type;
         }   
+        (*it_mg)->type = t_node->type;
         ++it_mg;
     }
 

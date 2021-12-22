@@ -13,16 +13,16 @@ int main()
     //string reg = "(((^|(1.0)+).0)|1.(^|(0.1)+).1).(^|(^|(0.(^|(0.1)+).(1|0.0)|1.(^|(1.0)+).(0|1.1)))+)";
     //string reg = "((((a)).(^|((a)|(a).(a))+).((a)))|(((a))|((a)).(^|((a)|(a).(a))+).((a).(a))).(^|(((a))|((a)).(^|((a)|(a).(a))+).((a).(a)))+).(((a)).(^|((a)|(a).(a))+).((a))))";
     //string reg = "(5:m.e.(p.h.i|o.w))";
-    string reg = "a.b.c.d";
+    string reg = "^|(a|b)+";
     
     My_Regex my_rx1(reg);
     //my_rx1.restore_regex("rstr_reg.txt");
-    My_Regex* my_rx2 = my_rx1.inversion();
-
-    cout << my_rx2->check_str("dcba") << endl;
+    //My_Regex* my_rx2 = my_rx1.inversion();
+    my_rx1.addition("aboba");
+    //cout << my_rx2->check_str("dcba") << endl;
 
     //map<int, string> cg;
-    //cout << my_rx1.check_str("meeepo", cg) << endl;
+    cout << my_rx1.check_str("") << endl;
 
     //cout << cg[10] << " " << cg[8];
 

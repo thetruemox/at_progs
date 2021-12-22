@@ -13,7 +13,11 @@ public:
 	std::string restore_regex();
 	std::string restore_regex(std::string file_name);
 
+	My_Regex* addition(std::string regex);
 	My_Regex* inversion();
+
+	void draw_dfa_graph(std::list<DFA_Node*> dfa_graph, std::string file_name);
+
 private:
 	DFA_Builder* dfa_builder;
 	std::list<DFA_Node*> dfa_graph;
@@ -23,7 +27,11 @@ private:
 	Capture_Groups* CG;
 
 	DFA_Node* get_node(int id);
+	DFA_Node* get_node(int id, std::list<DFA_Node*> node_list);
+
 	std::string _R(int k, int i, int j);
 	std::string _null_R(int i, int j);
 	void _flip_stree(ST_Node* node);
+	std::list<DFA_Node*> _multiply(std::list<DFA_Node*> graph_A, std::list<DFA_Node*> graph_B, std::map<std::string, int> abc);
+	DFA_Node* _find_mul_node(std::list<DFA_Node*> graph, int id1, int id2);
 };
