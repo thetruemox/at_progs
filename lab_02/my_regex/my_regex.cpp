@@ -8,7 +8,7 @@ My_Regex::My_Regex(std::string regex)
     this->dfa_graph = dfa_builder->get_min_dfa_graph();
     this->dfa_graph_start = this->dfa_graph.front();
     this->dfa_recieves = dfa_builder->get_min_dfa_graph_recieves();
-
+    
     /*
     dfa_builder->draw_min_dfa_graph("min_dfa.txt");
     dfa_builder->draw_dfa_graph("dfa.txt");
@@ -54,7 +54,7 @@ void My_Regex::draw_dfa_graph(std::list<DFA_Node*> dfa_graph, std::string file_n
         }
         else if ((*it_mg)->type == dfa_start_and_receiving)
         {
-            *out << (*it_mg)->id << " [label=\"" << (*it_mg)->id << "\\nstart and recieve\"];" << std::endl;
+            *out << (*it_mg)->id << " [label=\"" << (*it_mg)->id << "\\nstart\\nrecieve\"];" << std::endl;
         }
 
         for (auto it_nl = (*it_mg)->links.begin(); it_nl != (*it_mg)->links.end(); it_nl++)
@@ -82,10 +82,10 @@ void My_Regex::_flip_stree(ST_Node* node)
     if (node->right_ptr != nullptr) _flip_stree(node->right_ptr);
 }
 
-My_Regex* My_Regex::addition(std::string regex)
+My_Regex* My_Regex::addition()
 {
     std::map<std::string, int> abc = this->dfa_builder->get_abc();
-    std::string new_reg = "(";
+    std::string new_reg = "^|(";
 
     for (auto it = abc.begin(); it != abc.end(); it++)
     {
@@ -95,7 +95,11 @@ My_Regex* My_Regex::addition(std::string regex)
     new_reg += "+";
 
     DFA_Builder* sigma_kleene = new DFA_Builder(new_reg);
-    DFA_Builder* l_graph = new DFA_Builder(regex);
+
+    //this->draw_dfa_graph(sigma_kleene->get_min_dfa_graph(), "sigma.txt");
+
+    //DFA_Builder* l_graph = new DFA_Builder(regex);
+    DFA_Builder* l_graph = this->dfa_builder;
     std::list<DFA_Node*> subtract = this->_multiply(sigma_kleene->get_min_dfa_graph(), l_graph->get_min_dfa_graph(), abc);
 
     this->draw_dfa_graph(subtract, "addon.txt");
@@ -119,6 +123,7 @@ std::list<DFA_Node*> My_Regex::_multiply(std::list<DFA_Node*> graph_A, std::list
     graph_mul.front()->type = dfa_start;
 
     DFA_Node* tr_node_A, * tr_node_B;
+    DFA_node_type type_A, type_B;
     for (auto it_gm = graph_mul.begin(); it_gm != graph_mul.end(); it_gm++)
     {
         for (auto it_abc = abc.begin(); it_abc != abc.end(); it_abc++)
@@ -131,8 +136,10 @@ std::list<DFA_Node*> My_Regex::_multiply(std::list<DFA_Node*> graph_A, std::list
             }
         }
 
-        //Часть с назначанием принимающего состояния, возможно стоит перенести для большей универсальности функции умножения автоматов
-        if ((get_node((*it_gm)->mul_id_f, graph_A)->type == dfa_receiving || get_node((*it_gm)->mul_id_f, graph_A)->type == dfa_start_and_receiving) && (get_node((*it_gm)->mul_id_s, graph_B)->type != dfa_receiving || get_node((*it_gm)->mul_id_s, graph_B)->type != dfa_start_and_receiving))
+        //Часть с назначанием принимающего состояния, возможно стоит перенести для универсальности функции умножения автоматов
+        type_A = get_node((*it_gm)->mul_id_f, graph_A)->type;
+        type_B = get_node((*it_gm)->mul_id_s, graph_B)->type;
+        if ((type_A == dfa_receiving || type_A == dfa_start_and_receiving) && (type_B != dfa_receiving && type_B != dfa_start_and_receiving))
         {
             if ((*it_gm)->type == dfa_start)
             {

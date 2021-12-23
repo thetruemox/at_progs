@@ -13,7 +13,7 @@ public:
 	std::string restore_regex();
 	std::string restore_regex(std::string file_name);
 
-	My_Regex* addition(std::string regex);
+	My_Regex* addition();
 	My_Regex* inversion();
 
 	void draw_dfa_graph(std::list<DFA_Node*> dfa_graph, std::string file_name);

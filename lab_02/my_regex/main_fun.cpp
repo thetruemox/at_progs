@@ -13,12 +13,12 @@ int main()
     //string reg = "(((^|(1.0)+).0)|1.(^|(0.1)+).1).(^|(^|(0.(^|(0.1)+).(1|0.0)|1.(^|(1.0)+).(0|1.1)))+)";
     //string reg = "((((a)).(^|((a)|(a).(a))+).((a)))|(((a))|((a)).(^|((a)|(a).(a))+).((a).(a))).(^|(((a))|((a)).(^|((a)|(a).(a))+).((a).(a)))+).(((a)).(^|((a)|(a).(a))+).((a))))";
     //string reg = "(5:m.e.(p.h.i|o.w))";
-    string reg = "^|(a|b)+";
+    string reg = "b|c|d";
     
     My_Regex my_rx1(reg);
     //my_rx1.restore_regex("rstr_reg.txt");
     //My_Regex* my_rx2 = my_rx1.inversion();
-    my_rx1.addition("aboba");
+    my_rx1.addition();
     //cout << my_rx2->check_str("dcba") << endl;
 
     //map<int, string> cg;
