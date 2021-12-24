@@ -18,6 +18,8 @@ public:
 
 	void draw_dfa_graph(std::list<DFA_Node*> dfa_graph, std::string file_name);
 
+	std::list<std::string> findall(std::string line, std::string regex);
+
 private:
 	DFA_Builder* dfa_builder;
 	std::list<DFA_Node*> dfa_graph;
@@ -34,4 +36,5 @@ private:
 	void _flip_stree(ST_Node* node);
 	std::list<DFA_Node*> _multiply(std::list<DFA_Node*> graph_A, std::list<DFA_Node*> graph_B, std::map<std::string, int> abc);
 	DFA_Node* _find_mul_node(std::list<DFA_Node*> graph, int id1, int id2);
+	void _delete_terminal_state(std::list<DFA_Node*> graph);
 };

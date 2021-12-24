@@ -9,8 +9,8 @@ My_Regex::My_Regex(std::string regex)
     this->dfa_graph_start = this->dfa_graph.front();
     this->dfa_recieves = dfa_builder->get_min_dfa_graph_recieves();
     
-    /*
     dfa_builder->draw_min_dfa_graph("min_dfa.txt");
+    /*
     dfa_builder->draw_dfa_graph("dfa.txt");
     dfa_builder->draw_nfa_graph("nfa.txt");
     dfa_builder->draw_syntax_tree("stree.txt");
@@ -33,9 +33,7 @@ My_Regex* My_Regex::inversion()
     DFA_Builder* dfa_builder = new DFA_Builder(new NFA_Builder(tmp_stree));
     My_Regex* my_regex = new My_Regex(dfa_builder);
 
-    /*
-    dfa->draw_min_dfa_graph("flip_dfa.txt");
-    */
+    //dfa->draw_min_dfa_graph("flip_dfa.txt");
     return my_regex;
 }
 
@@ -65,6 +63,56 @@ void My_Regex::draw_dfa_graph(std::list<DFA_Node*> dfa_graph, std::string file_n
     }
 
     *out << "}";
+}
+
+std::list<std::string> My_Regex::findall(std::string line, std::string regex)
+{
+    My_Regex* mrgx = new My_Regex(regex);
+
+    this->_delete_terminal_state(mrgx->dfa_graph);
+
+    DFA_Node* start_node = mrgx->dfa_graph_start;
+    DFA_Node* cur_node = start_node;
+    DFA_Node* next_node = nullptr;
+
+    std::list<std::string> matches;
+    std::string tmp_match = "", inside_match = "";
+
+    for (int i = 0; i < line.length(); i++)
+    {
+        next_node = cur_node->transition(line[i]);
+        if (next_node != nullptr)
+        {
+            if (cur_node->type == dfa_receiving || cur_node->type == dfa_start_and_receiving)
+            {
+                inside_match = tmp_match;
+            }
+            tmp_match += line[i];
+            cur_node = next_node;
+        }
+        else
+        {
+            if (tmp_match.size() != 0 && (cur_node->type == dfa_receiving || cur_node->type == dfa_start_and_receiving))
+            {
+                matches.push_back(tmp_match);                       
+            }
+            else if (inside_match.size() != 0)
+            {
+                matches.push_back(inside_match);
+            }
+            tmp_match = "";
+            inside_match = "";
+            cur_node = start_node;
+        }
+    }
+
+    if (tmp_match.size() != 0 && (cur_node->type == dfa_receiving || cur_node->type == dfa_start_and_receiving))
+    {
+        matches.push_back(tmp_match);
+        tmp_match = "";
+    }
+
+    return matches;
 }
 
 
@@ -163,6 +211,52 @@ DFA_Node* My_Regex::_find_mul_node(std::list<DFA_Node*> graph, int id1, int id2)
     return nullptr;
 }
 
+void My_Regex::_delete_terminal_state(std::list<DFA_Node*> graph)
+{
+    int del_id;
+    std::list<DFA_Node*>::iterator del_it;
+    int cycled;
+    for (auto it = graph.begin(); it != graph.end(); it++)
+    {
+        del_id = (*it)->id;
+        del_it = it;
+        cycled = 1;
+        for (auto it_tr = (*it)->links.begin(); it_tr != (*it)->links.end(); it_tr++)
+        {
+            if ((*it_tr).first->id != del_id)
+            {
+                cycled = 0;
+                break;
+            }
+        }
+
+        if (cycled == 1)
+        {
+            break;
+        }
+    }
+    
+    std::list<std::pair<DFA_Node*, std::string>>::iterator it_tr;
+    std::list<std::pair<DFA_Node*, std::string>>::iterator it_tr_prev;
+    for (auto it = graph.begin(); it != graph.end(); it++)
+    {
+        it_tr = (*it)->links.begin();
+
+        for (int i_tr = 0; i_tr < (*it)->links.size(); i_tr++)
+        {
+            it_tr_prev = it_tr++;
+            if ((*it_tr_prev).first->id == del_id && (*it)->id != del_id)
+            {
+                (*it)->links.erase(it_tr_prev);   
+                i_tr--;
+            }       
+        }
+    }
+    graph.erase(del_it);
+
+    //draw_dfa_graph(graph, "erased_terminal.txt");
+}
+
 int My_Regex::check_str(std::string str)
 {
     DFA_Node* cur_node = this->dfa_graph_start;
@@ -203,15 +297,13 @@ int My_Regex::check_str(std::string str, std::map<int, std::string> &capture)
 {
     DFA_Node* cur_node = this->dfa_graph_start;
     DFA_Node* next_node = nullptr;
-    CG_Unit* last_unit = &(this->CG->units.front());
 
     for (int i = 0; i < str.length(); i++)
     {
         next_node = cur_node->transition(str[i]);
         if (next_node != nullptr)
         {
-            CG->capture(cur_node->id, next_node->id, str[i], last_unit);
-
+            CG->capture(cur_node->id, next_node->id, str[i]);
             cur_node = next_node;
         }
         else
