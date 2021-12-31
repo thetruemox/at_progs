@@ -10,22 +10,31 @@ using namespace std;
 
 int main()
 {
-    //string reg = "(((^|(1.0)+).0)|1.(^|(0.1)+).1).(^|(^|(0.(^|(0.1)+).(1|0.0)|1.(^|(1.0)+).(0|1.1)))+)";
-    //string reg = "((((a)).(^|((a)|(a).(a))+).((a)))|(((a))|((a)).(^|((a)|(a).(a))+).((a).(a))).(^|(((a))|((a)).(^|((a)|(a).(a))+).((a).(a)))+).(((a)).(^|((a)|(a).(a))+).((a))))";
-    //string reg = "(5:m.e.(p.h.i|o.w))";
+
     string reg = "a.b.c";
     
     My_Regex my_rx1(reg);
-    std::list<std::string> mtchs = my_rx1.findall("abcdaaaa", "a+.(^|(b.a)+)");
 
+    /* restore_regex
+    my_rx1.restore_regex("rstr_reg.txt");
+    */
+
+    /* inversion
+    My_Regex* my_rx2 = my_rx1.inversion();
+    cout << my_rx2->check_str("cba");
+    */
+    
+    /* addon -> addon.txt
+    my_rx1.addition();
+    */ 
+
+   
+    std::list<std::string> mtchs = my_rx1.findall("ababcdaaaa", "a+.(^|(b.a)+)");
     for (auto it = mtchs.begin(); it != mtchs.end(); it++)
     {
         cout << (*it) << " ";
     }
     
-    //my_rx1.addition();
-
-    //cout << my_rx1.check_str("") << endl;
 
     return 0;
 }

@@ -33,7 +33,6 @@ My_Regex* My_Regex::inversion()
     DFA_Builder* dfa_builder = new DFA_Builder(new NFA_Builder(tmp_stree));
     My_Regex* my_regex = new My_Regex(dfa_builder);
 
-    //dfa->draw_min_dfa_graph("flip_dfa.txt");
     return my_regex;
 }
 
@@ -145,13 +144,12 @@ My_Regex* My_Regex::addition()
     DFA_Builder* sigma_kleene = new DFA_Builder(new_reg);
 
     //this->draw_dfa_graph(sigma_kleene->get_min_dfa_graph(), "sigma.txt");
-
     //DFA_Builder* l_graph = new DFA_Builder(regex);
+
     DFA_Builder* l_graph = this->dfa_builder;
     std::list<DFA_Node*> subtract = this->_multiply(sigma_kleene->get_min_dfa_graph(), l_graph->get_min_dfa_graph(), abc);
 
     this->draw_dfa_graph(subtract, "addon.txt");
-
     return nullptr;
 }
 

@@ -16,8 +16,6 @@ public:
 	My_Regex* addition();
 	My_Regex* inversion();
 
-	void draw_dfa_graph(std::list<DFA_Node*> dfa_graph, std::string file_name);
-
 	std::list<std::string> findall(std::string line, std::string regex);
 
 private:
@@ -27,6 +25,8 @@ private:
 	std::list<DFA_Node*> dfa_recieves;
 	
 	Capture_Groups* CG;
+
+	void draw_dfa_graph(std::list<DFA_Node*> dfa_graph, std::string file_name);
 
 	DFA_Node* get_node(int id);
 	DFA_Node* get_node(int id, std::list<DFA_Node*> node_list);
