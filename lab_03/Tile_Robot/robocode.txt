@@ -1,0 +1,9 @@
+integer main()
+start
+
+integer num := 1;
+
+
+string name := "Hello World";
+
+finish
