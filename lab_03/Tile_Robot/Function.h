@@ -6,10 +6,16 @@
 class Function
 {
 public:
+	Function(Variable* return_var, std::string name, std::vector<Variable**> args, int start_i);
 	
+	void add_var(Variable* variable);
+	Variable* get_var(std::string var_name);
+
 private:
 	std::string name;
+	std::vector<Variable**> args;
 	std::map<std::string, Variable*> scope;
-	var_type return_type;
+	Variable* return_var;
+
 	int start_i;
 };

@@ -5,5 +5,5 @@ integer num := 1;
 
 
 string name := "Hello World";
-
+return 0;
 finish

@@ -32,12 +32,37 @@ void Interpreter::_collect()
 
 	for (int i = 0; i < code.size(); i++)
 	{
+		//ѕоиск объ€влени€ функции
 		if (regex_match(code[i].c_str(), cap_gr, function_rx))
 		{
-			if (cap_gr[2] != false)
+			if (code[i + 1] != "start") throw "Expected 'start', after function declaration";
+			
+			/*
+			* Group 1 Ц fun type 
+			* ≈сли указатель, то
+			*	Group 2 Ц fun type
+			*	Group 3 Ц pointer type
+			* Group 4 Ц fun name 
+			* Group 5 Ц fun argumets
+			*/
+
+			if (cap_gr[2] != false && cap_gr[3] != false)
+			{
+				//‘ункци€ возвращает указатель
+
+			}
+			else
 			{
 				
 			}
+
 		}
+
+
+
+
 	}
+
+
+	//¬ конце работы collect, необходимо добавить main в call_stack
 }
