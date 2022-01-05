@@ -1,16 +1,21 @@
 #include "Function.h"
 
-Function::Function(Variable* return_var, std::string name, std::vector<Variable**> args, int start_i)
+Function::Function(Variable* return_var, std::string name, int start_i)
 {
 	this->return_var = return_var;
 	this->name = name;
-	this->args = args;
 	this->start_i = start_i;
 }
 
 void Function::add_var(Variable* variable)
 {
 	this->scope[variable->get_name()] = variable;
+}
+
+void Function::add_arg(Variable* variable)
+{
+	this->scope[variable->get_name()] = variable;
+	this->args.push_back(&variable);
 }
 
 Variable* Function::get_var(std::string var_name)

@@ -4,7 +4,7 @@
 class Pointer : virtual public Variable
 {
 public:
-	Pointer(std::string var_name);
+	Pointer(std::string var_name, var_type pointed_type);
 	var_type get_type() override;
 	std::string get_name() override;
 
@@ -14,6 +14,7 @@ public:
 private:
 	std::string name;
 	var_type type;
+	var_type pointed_type;
 	Variable* value;
 	bool is_mutable;
 };

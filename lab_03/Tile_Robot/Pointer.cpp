@@ -1,9 +1,10 @@
 #include "Pointer.h"
 
-Pointer::Pointer(std::string var_name)
+Pointer::Pointer(std::string var_name, var_type pointed_type)
 {
 	this->name = var_name;
 	this->type = vt_Pointer;
+	this->pointed_type = pointed_type;
 	this->is_mutable = true;
 }
 

@@ -14,7 +14,9 @@ using namespace std;
 
 int main()
 {
-    Interpreter ntrptr("robocode.txt");
+	Interpreter ntrptr("robocode.txt");
+
+    
 
     return 0;
 }

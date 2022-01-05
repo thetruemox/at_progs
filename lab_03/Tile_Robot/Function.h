@@ -6,9 +6,10 @@
 class Function
 {
 public:
-	Function(Variable* return_var, std::string name, std::vector<Variable**> args, int start_i);
+	Function(Variable* return_var, std::string name, int start_i);
 	
 	void add_var(Variable* variable);
+	void add_arg(Variable* variable);
 	Variable* get_var(std::string var_name);
 
 private:

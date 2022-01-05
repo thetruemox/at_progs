@@ -5,7 +5,11 @@
 #include <fstream>
 #include <regex>
 #include <stack>
+
 #include "Function.h"
+#include "Integer.h"
+#include "String.h"
+#include "Pointer.h"
 
 class Interpreter
 {

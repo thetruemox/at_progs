@@ -1,3 +1,9 @@
+string name()
+start
+return "Hello World";
+finish
+
+
 integer main()
 start
 
