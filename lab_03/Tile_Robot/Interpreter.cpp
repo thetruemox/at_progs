@@ -25,6 +25,11 @@ Interpreter::Interpreter(std::string file_name)
 
 void Interpreter::_collect()
 {
+	/* todo or not todo
+	* Возможно в этом методе стоит: 
+	*	
+	*/
+
 	//Стек ожидания. Используется для проверки присутствия return у функций и закрытых групп предложений языка
 	std::stack<std::string> exp_stack;
 
@@ -161,7 +166,7 @@ void Interpreter::_collect()
 			continue;
 		}
 
-		if (regex_match(code[i].c_str(), cap_gr, return_rx))
+		if (regex_match(code[i].c_str(), return_rx))
 		{
 			if (!exp_stack.empty() && exp_stack.top() != "return") throw ("Expected 'return', at line: " + std::to_string(i+1));
 			if (exp_stack.empty()) throw ("Extra 'return' met, at line: " + std::to_string(i+1));

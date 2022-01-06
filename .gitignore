@@ -341,3 +341,4 @@ healthchecksdb
 *.vcxproj
 *.filters
 /lab_03/Tile_Robot/Tile_Robot.sln
+/lab_03/Tile_Robot/godhelpme.txt

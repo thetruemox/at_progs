@@ -9,12 +9,15 @@
 #include "Array.h"
 
 #include "Interpreter.h"
+#include "Calculator/ST_Calculator.h"
 
 using namespace std;
 
 int main()
 {
-	Interpreter ntrptr("robocode.txt");
+	//Interpreter ntrptr("robocode.txt");
+	ST_Calculator stree("a");
+	stree.draw_syntax_tree("godhelpme.txt");
 
     return 0;
 }
