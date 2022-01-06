@@ -24,7 +24,13 @@ public:
 	Interpreter(std::string file_name);
 
 private:
-	std::stack<int> call_stack; //В стеке хранится позиция начала вызываемой функции
+	/*
+	* В этом стеке находится номер позиции в коде, к которой 
+	* необходимо вернуться в случае встречи return или начала 
+	* программы
+	*/
+	std::stack<int> call_stack; 
+
 	std::vector<std::string> code;
 	std::map<std::string, Function*> functions;
 

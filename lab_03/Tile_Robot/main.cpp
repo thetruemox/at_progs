@@ -16,7 +16,5 @@ int main()
 {
 	Interpreter ntrptr("robocode.txt");
 
-    
-
     return 0;
 }

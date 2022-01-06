@@ -1,15 +1,9 @@
 string name()
 start
-return "Hello World";
+return "Hello world";
 finish
-
 
 integer main()
 start
-
-integer num := 1;
-
-
-string name := "Hello World";
 return 0;
 finish
