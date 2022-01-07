@@ -15,6 +15,8 @@ using namespace std;
 
 int main()
 {
+	//std::regex str("[\"](.*)[\"]");
+
 	//Interpreter ntrptr("robocode.txt");
 	ST_Calculator stree("\"14\"+\"88\"");
 	String* str = new String("str");

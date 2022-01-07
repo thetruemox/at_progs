@@ -221,7 +221,6 @@ void ST_Calculator::calculate(Integer* result, Function* cur_fun, ST_Node* cur_n
 void ST_Calculator::calculate(String* result, Function* cur_fun, ST_Node* cur_node)
 {
     std::regex name("[a-zA-Z][a-zA-Z0-9]*");
-    std::regex str("[\"](.*)[\"]");
 
     //Лист
     if (cur_node->left_ptr == nullptr && cur_node->right_ptr == nullptr && !cur_node->is_checked)
@@ -234,7 +233,7 @@ void ST_Calculator::calculate(String* result, Function* cur_fun, ST_Node* cur_no
         {
             new_var->set_value(fun_var->get_value());
         }
-        else if (regex_match(this->node_values[cur_node->index].c_str(), str))
+        else if (cur_fun->get_var(this->node_values[cur_node->index]) == nullptr)
         {
             new_var->set_value(this->node_values[cur_node->index]);
         }
