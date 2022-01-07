@@ -133,6 +133,90 @@ ST_Calculator::ST_Calculator(std::string math_expr)
     this->root = _get_root();
 }
 
+void ST_Calculator::calculate(Integer* result, Function* cur_fun, ST_Node* cur_node)
+{
+    std::regex name("[a-zA-Z][a-zA-Z0-9]*");
+
+    //Лист
+    if (cur_node->left_ptr == nullptr && cur_node->right_ptr == nullptr && !cur_node->is_checked)
+    {     
+        Integer* fun_var = dynamic_cast<Integer*>(cur_fun->get_var(this->node_values[cur_node->index]));
+        cur_node->value = new Integer(std::to_string(cur_node->index));
+        Integer* new_var = dynamic_cast<Integer*>(cur_node->value);
+
+        if (regex_match(this->node_values[cur_node->index].c_str(), name))
+        {      
+            new_var->set_value(fun_var->get_value());
+        }
+        else
+        {
+            new_var->set_value(std::stoi(this->node_values[cur_node->index]));
+        }
+
+        cur_node->is_checked = 1;
+        calculate(result, cur_fun, cur_node->parent);
+        return;
+    }
+
+    //Узел
+    if (cur_node->left_ptr->is_checked && cur_node->right_ptr->is_checked && !cur_node->is_checked)
+    {
+        cur_node->value = new Integer(std::to_string(cur_node->index));
+        Integer* cur_var = dynamic_cast<Integer*>(cur_node->value);
+        Integer* left_var = dynamic_cast<Integer*>(cur_node->left_ptr->value);
+        Integer* right_var = dynamic_cast<Integer*>(cur_node->right_ptr->value);
+
+        switch (cur_node->sign)
+        {
+        case '*':
+            cur_var->set_value(left_var->get_value() * right_var->get_value());
+            break;
+        case '/':
+            cur_var->set_value(left_var->get_value() / right_var->get_value());
+            break;
+        case '%':
+            cur_var->set_value(left_var->get_value() % right_var->get_value());
+            break;
+        case '+':
+            cur_var->set_value(left_var->get_value() + right_var->get_value());
+            break;
+        case '-':
+            cur_var->set_value(left_var->get_value() - right_var->get_value());
+            break;
+        case '=':
+            cur_var->set_value(left_var->get_value() == right_var->get_value());
+            break;
+        case '>':
+            cur_var->set_value(left_var->get_value() > right_var->get_value());
+            break;
+        case '<':
+            cur_var->set_value(left_var->get_value() < right_var->get_value());
+            break;
+        default:
+            break;
+        }
+
+        cur_node->is_checked = 1;
+        if (cur_node->parent != nullptr) calculate(result, cur_fun, cur_node->parent);   
+        return;
+    }
+
+    if (!cur_node->left_ptr->is_checked)
+    {
+        calculate(result, cur_fun, cur_node->left_ptr);
+    }
+    if (!cur_node->right_ptr->is_checked)
+    {
+        calculate(result, cur_fun, cur_node->right_ptr);
+    }
+
+    if (cur_node->parent == nullptr && cur_node->is_checked)
+    {
+        result->set_value(dynamic_cast<Integer*>(cur_node->value)->get_value());
+        return;
+    }
+}
+
 ST_Node* ST_Calculator::get_root()
 {
     return this->root;
@@ -165,11 +249,6 @@ void ST_Calculator::draw_syntax_tree(std::string file_name)
     }
 
     *out << "}";
-}
-
-void ST_Calculator::calculate(ST_Node* cur_node, var_type calc_type, Function* cur_fun)
-{
-
 }
 
 void ST_Calculator::add_brackets(int open, int close)

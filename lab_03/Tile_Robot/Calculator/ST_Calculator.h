@@ -6,8 +6,11 @@
 #include <iostream>
 #include <fstream>
 #include <regex>
+
 #include "ST_Node.h"
 #include "../Function.h"
+#include "../Integer.h"
+#include "../String.h"
 
 enum bracket_type
 {
@@ -21,7 +24,8 @@ public:
 	ST_Node* get_root();
 	void draw_syntax_tree(std::string file_name);
 
-	void calculate(ST_Node* cur_node, var_type calc_type, Function* cur_fun);
+	void calculate(Integer* result, Function* cur_fun, ST_Node* cur_node);
+	void calculate(String* result, Function* cur_fun, ST_Node* cur_node);
 private:
 	std::list<ST_Node*> nodes;
 	std::list<std::pair<int, bracket_type>> brackets;

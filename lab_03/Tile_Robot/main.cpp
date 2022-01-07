@@ -16,7 +16,12 @@ using namespace std;
 int main()
 {
 	//Interpreter ntrptr("robocode.txt");
-	ST_Calculator stree("a");
+	ST_Calculator stree("(4+8*1)/2");
+	Integer* num = new Integer("num");
+	stree.calculate(num, new Function(num, (string)("main"), 4), stree.get_root());
+
+	cout << num->get_value();
+
 	stree.draw_syntax_tree("godhelpme.txt");
 
     return 0;
