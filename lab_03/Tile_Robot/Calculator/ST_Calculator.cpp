@@ -141,11 +141,13 @@ void ST_Calculator::calculate(Integer* result, Function* cur_fun, ST_Node* cur_n
     if (cur_node->left_ptr == nullptr && cur_node->right_ptr == nullptr && !cur_node->is_checked)
     {     
         Integer* fun_var = dynamic_cast<Integer*>(cur_fun->get_var(this->node_values[cur_node->index]));
+
         cur_node->value = new Integer(std::to_string(cur_node->index));
         Integer* new_var = dynamic_cast<Integer*>(cur_node->value);
 
         if (regex_match(this->node_values[cur_node->index].c_str(), name))
-        {      
+        {     
+            if (fun_var == nullptr) throw (std::string)("There is no such variable '" + this->node_values[cur_node->index] + "' in scope of function '" + cur_fun->get_fun_name() + "'");
             new_var->set_value(fun_var->get_value());
         }
         else
@@ -193,7 +195,7 @@ void ST_Calculator::calculate(Integer* result, Function* cur_fun, ST_Node* cur_n
             cur_var->set_value(left_var->get_value() < right_var->get_value());
             break;
         default:
-            throw (std::string)("Error, there is no such math operator");
+            throw (std::string)("Error, this operator doesn`t work for integer variable: " + cur_node->sign);
             break;
         }
 
@@ -254,32 +256,11 @@ void ST_Calculator::calculate(String* result, Function* cur_fun, ST_Node* cur_no
 
         switch (cur_node->sign)
         {
-        //case '*':
-        //    cur_var->set_value(left_var->get_value() * right_var->get_value());
-        //    break;
-        //case '/':
-        //    cur_var->set_value(left_var->get_value() / right_var->get_value());
-        //    break;
-        //case '%':
-        //    cur_var->set_value(left_var->get_value() % right_var->get_value());
-        //    break;
         case '+':
             cur_var->set_value(left_var->get_value() + right_var->get_value());
             break;
-        //case '-':
-        //    cur_var->set_value(left_var->get_value() - right_var->get_value());
-        //    break;
-        //case '=':
-        //    cur_var->set_value(left_var->get_value() == right_var->get_value());
-        //    break;
-        //case '>':
-        //    cur_var->set_value(left_var->get_value() > right_var->get_value());
-        //    break;
-        //case '<':
-        //    cur_var->set_value(left_var->get_value() < right_var->get_value());
-        //    break;
         default:
-            throw (std::string)("Error, there is no such math operator");
+            throw (std::string)("Error, this operator doesn`t work for string variable: " + cur_node->sign);
             break;
         }
 

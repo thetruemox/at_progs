@@ -1,9 +1,6 @@
-string name()
-start
-return "Hello world";
-finish
-
 integer main()
 start
+integer num1:=5;
+mutable integer num2:=num1+3;
 return 0;
 finish

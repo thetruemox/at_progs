@@ -23,6 +23,11 @@ Variable* Function::get_var(std::string var_name)
 	return this->scope[var_name];
 }
 
+std::string Function::get_fun_name()
+{
+	return this->name;
+}
+
 int Function::get_start_i()
 {
 	return this->start_i;

@@ -11,6 +11,7 @@ public:
 	void add_var(Variable* variable);
 	void add_arg(Variable* variable);
 	Variable* get_var(std::string var_name);
+	std::string get_fun_name();
 	int get_start_i();
 
 private:

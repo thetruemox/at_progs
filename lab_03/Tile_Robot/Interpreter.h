@@ -6,6 +6,7 @@
 #include <regex>
 #include <stack>
 
+#include "Calculator/ST_Calculator.h"
 #include "Function.h"
 #include "Integer.h"
 #include "String.h"
