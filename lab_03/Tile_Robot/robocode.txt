@@ -1,6 +1,6 @@
 integer main()
 start
-integer num1:=5;
-mutable integer num2:=num1+3;
+mutable integer num:=5;
+num:=num+5;
 return 0;
 finish

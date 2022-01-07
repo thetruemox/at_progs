@@ -198,6 +198,8 @@ void Interpreter::_execute()
 	std::regex int_operand("(-?[0-9]+)|([a-zA-Z][a-zA-Z0-9]*)"); //cg[1]=number, cg[2]=variable
 	std::regex str_operand("([\"].+[\"])|([a-zA-Z][a-zA-Z0-9]*)"); //cg[1]=str, cg[2]=variable
 
+	std::regex var_assignment_rx("([a-zA-Z][a-zA-Z0-9]*):=(([a-zA-Z][a-zA-Z0-9]*)|(.+));"); //cg[1]=var_name, cg[3]=variable, cg[4]=expr
+
 	Function* cur_context = this->functions["main"]; //Функция, внутри контекста которой работает интерпретатор
 	int GI = this->call_stack.top(); //Глобальный индекс
 	this->call_stack.pop();
@@ -280,6 +282,54 @@ void Interpreter::_execute()
 			continue;
 		}
 
+		//Присваивание переменной
+		if (regex_match(code[GI].c_str(), cg, var_assignment_rx))
+		{
+			Integer* orig_var;
+			Integer* fun_var;
+			switch (cur_context->get_var(cg[1])->get_type())
+			{
+			case vt_Integer:
+				orig_var = dynamic_cast<Integer*>(cur_context->get_var(cg[1]));
+				fun_var = nullptr;
+
+				if (cg[3].length() != 0) //Переменная
+				{
+					fun_var = dynamic_cast<Integer*>(cur_context->get_var(cg[3]));
+					orig_var->set_value(fun_var->get_value());
+				}
+				else if (cg[4].length() != 0) //Число или выражение
+				{
+					std::cmatch local_cg;
+					std::string crutch = cg[4];
+					regex_match(crutch.c_str(), local_cg, int_operand);
+
+					if (local_cg[1].length() != 0) //Число
+					{
+						orig_var->set_value(std::stoi(local_cg[1]));
+					}
+					else //Выражение
+					{
+						Integer* result = new Integer("result");
+						ST_Calculator int_calculator(crutch);
+						int_calculator.calculate(result, cur_context, int_calculator.get_root());
+						orig_var->set_value(result->get_value());
+						delete result;
+					}
+				}
+
+				break;
+			case vt_String:
+				break;
+			default:
+				throw (std::string)("This type not supported, at line: " + std::to_string(GI+1));
+				break;
+			}
+
+			
+		}
+
+		//Присваивание типа A:=B:=C
 
 	}
 
