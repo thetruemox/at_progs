@@ -193,6 +193,7 @@ void ST_Calculator::calculate(Integer* result, Function* cur_fun, ST_Node* cur_n
             cur_var->set_value(left_var->get_value() < right_var->get_value());
             break;
         default:
+            throw (std::string)("Error, there is no such math operator");
             break;
         }
 
@@ -213,6 +214,93 @@ void ST_Calculator::calculate(Integer* result, Function* cur_fun, ST_Node* cur_n
     if (cur_node->parent == nullptr && cur_node->is_checked)
     {
         result->set_value(dynamic_cast<Integer*>(cur_node->value)->get_value());
+        return;
+    }
+}
+
+void ST_Calculator::calculate(String* result, Function* cur_fun, ST_Node* cur_node)
+{
+    std::regex name("[a-zA-Z][a-zA-Z0-9]*");
+    std::regex str("[\"](.*)[\"]");
+
+    //Лист
+    if (cur_node->left_ptr == nullptr && cur_node->right_ptr == nullptr && !cur_node->is_checked)
+    {
+        String* fun_var = dynamic_cast<String*>(cur_fun->get_var(this->node_values[cur_node->index]));
+        cur_node->value = new String(std::to_string(cur_node->index));
+        String* new_var = dynamic_cast<String*>(cur_node->value);
+
+        if (regex_match(this->node_values[cur_node->index].c_str(), name))
+        {
+            new_var->set_value(fun_var->get_value());
+        }
+        else if (regex_match(this->node_values[cur_node->index].c_str(), str))
+        {
+            new_var->set_value(this->node_values[cur_node->index]);
+        }
+        else throw (std::string)("Unknown expression: " + this->node_values[cur_node->index]);
+
+        cur_node->is_checked = 1;
+        calculate(result, cur_fun, cur_node->parent);
+        return;
+    }
+
+    //Узел
+    if (cur_node->left_ptr->is_checked && cur_node->right_ptr->is_checked && !cur_node->is_checked)
+    {
+        cur_node->value = new String(std::to_string(cur_node->index));
+        String* cur_var = dynamic_cast<String*>(cur_node->value);
+        String* left_var = dynamic_cast<String*>(cur_node->left_ptr->value);
+        String* right_var = dynamic_cast<String*>(cur_node->right_ptr->value);
+
+        switch (cur_node->sign)
+        {
+        //case '*':
+        //    cur_var->set_value(left_var->get_value() * right_var->get_value());
+        //    break;
+        //case '/':
+        //    cur_var->set_value(left_var->get_value() / right_var->get_value());
+        //    break;
+        //case '%':
+        //    cur_var->set_value(left_var->get_value() % right_var->get_value());
+        //    break;
+        case '+':
+            cur_var->set_value(left_var->get_value() + right_var->get_value());
+            break;
+        //case '-':
+        //    cur_var->set_value(left_var->get_value() - right_var->get_value());
+        //    break;
+        //case '=':
+        //    cur_var->set_value(left_var->get_value() == right_var->get_value());
+        //    break;
+        //case '>':
+        //    cur_var->set_value(left_var->get_value() > right_var->get_value());
+        //    break;
+        //case '<':
+        //    cur_var->set_value(left_var->get_value() < right_var->get_value());
+        //    break;
+        default:
+            throw (std::string)("Error, there is no such math operator");
+            break;
+        }
+
+        cur_node->is_checked = 1;
+        if (cur_node->parent != nullptr) calculate(result, cur_fun, cur_node->parent);
+        return;
+    }
+
+    if (!cur_node->left_ptr->is_checked)
+    {
+        calculate(result, cur_fun, cur_node->left_ptr);
+    }
+    if (!cur_node->right_ptr->is_checked)
+    {
+        calculate(result, cur_fun, cur_node->right_ptr);
+    }
+
+    if (cur_node->parent == nullptr && cur_node->is_checked)
+    {
+        result->set_value(dynamic_cast<String*>(cur_node->value)->get_value());
         return;
     }
 }
