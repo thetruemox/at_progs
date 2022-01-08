@@ -156,7 +156,15 @@ void ST_Calculator::calculate(Integer* result, Function* cur_fun, ST_Node* cur_n
         }
 
         cur_node->is_checked = 1;
-        calculate(result, cur_fun, cur_node->parent);
+        if (cur_node->parent != nullptr) calculate(result, cur_fun, cur_node->parent);
+
+        //Случай одной переменной
+        if (cur_node->parent == nullptr && cur_node->left_ptr == nullptr && cur_node->right_ptr == nullptr)
+        {
+            result->set_value(dynamic_cast<Integer*>(cur_node->value)->get_value());
+            return;
+        }
+
         return;
     }
 

@@ -1,6 +1,15 @@
 integer main()
 start
-mutable integer num:=5;
-num:=num+5;
+mutable integer num:=0;
+
+checkzero (num)
+start
+num:=1;
+finish
+instead
+start
+num:=0;
+finish
+
 return 0;
 finish

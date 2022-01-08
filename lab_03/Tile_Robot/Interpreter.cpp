@@ -197,8 +197,9 @@ void Interpreter::_execute()
 	std::regex var_declaration_rx("((mutable)[ ])?(integer|string|pointer<(integer|string)>)[ ]([a-zA-Z][a-zA-Z0-9]*)((;)|:=(.+);)"); //cg[2]=mutable, cg[3]=var_type, cg[4]=pointer_type, cg[5]=var_name, cg[7]=only_declaration, cg[8]=assigment
 	std::regex int_operand("(-?[0-9]+)|([a-zA-Z][a-zA-Z0-9]*)"); //cg[1]=number, cg[2]=variable
 	std::regex str_operand("([\"].+[\"])|([a-zA-Z][a-zA-Z0-9]*)"); //cg[1]=str, cg[2]=variable
-
 	std::regex var_assignment_rx("([a-zA-Z][a-zA-Z0-9]*):=(([a-zA-Z][a-zA-Z0-9]*)|(.+));"); //cg[1]=var_name, cg[3]=variable, cg[4]=expr
+	std::regex checkzero_rx("checkzero[ ][(](.+)[)]"); //cg[1]=expr
+	std::regex finish_rx("finish");
 
 	Function* cur_context = this->functions["main"]; //Функция, внутри контекста которой работает интерпретатор
 	int GI = this->call_stack.top(); //Глобальный индекс
@@ -331,6 +332,71 @@ void Interpreter::_execute()
 
 		//Присваивание типа A:=B:=C
 
+		//Условный оператор
+		if (regex_match(code[GI].c_str(), cg, checkzero_rx))
+		{
+			//Если существует start, то _collect гарантирует наличие finish
+			if (code[GI + 1] != "start") throw (std::string)("Expected 'start', at line: " + std::to_string(GI+2));
+			
+			/*
+			* Если выражение равно 0, то выполняется первое тело и потом 
+			* переходит по call_stack в конец условного оператора			
+			*/
+
+			int checkzero_i = GI; //Индекс оператора checkzero
+			int instead_i = -1; //Индекс оператора instead
+			int finish_i = -1; //Индекс конца условного оператора
+
+			while (1)
+			{
+				GI++;
+				if (code[GI] == "finish")
+				{
+					if (code[GI + 1] == "instead")
+					{
+						if (code[GI + 2] != "start") throw (std::string)("Expected 'start', at line: " + std::to_string(GI + 3));
+						instead_i = GI + 1;
+					}
+					else
+					{ 
+						finish_i = GI;
+						break;
+					}
+				}
+			}
+
+			ST_Calculator int_calculator(cg[1]);
+			Integer* result = new Integer("result");
+			int_calculator.calculate(result, cur_context, int_calculator.get_root());
+
+			if (result->get_value() == 0)
+			{
+				GI = checkzero_i + 2;
+				this->call_stack.push(finish_i + 1);
+			}
+			else
+			{
+				GI = instead_i + 2;
+				this->call_stack.push(finish_i + 1);
+			}
+
+			delete result;
+			continue;
+		}
+
+		//Окончание группы
+		if (regex_match(code[GI].c_str(), finish_rx))
+		{
+			if (this->call_stack.empty()) throw (std::string)("Call_stack was empty, at line: " + std::to_string(GI+1));
+
+			GI = this->call_stack.top();
+			this->call_stack.pop();
+			continue;
+		}
+
+		//Возвращаемое значение
+
+		GI++; //временный костыль
 	}
 
 }
