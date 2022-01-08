@@ -306,6 +306,7 @@ void Interpreter::_execute()
 
 				called_fun->set_beneficiary(beneficiary);
 			}
+			else called_fun->set_beneficiary(nullptr);
 
 			//Проверка параметров
 			if (cg[4].length() != 0)
