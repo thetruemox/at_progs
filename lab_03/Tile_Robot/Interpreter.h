@@ -8,9 +8,9 @@
 
 #include "Calculator/ST_Calculator.h"
 #include "Function.h"
-#include "Integer.h"
-#include "String.h"
-#include "Pointer.h"
+#include "Variables/Variable.h"
+#include "Variables/String.h"
+#include "Variables/Pointer.h"
 
 class Interpreter
 {

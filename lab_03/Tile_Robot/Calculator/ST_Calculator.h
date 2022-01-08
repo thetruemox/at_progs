@@ -9,8 +9,8 @@
 
 #include "ST_Node.h"
 #include "../Function.h"
-#include "../Integer.h"
-#include "../String.h"
+#include "../Variables/Integer.h"
+#include "../Variables/String.h"
 
 enum bracket_type
 {

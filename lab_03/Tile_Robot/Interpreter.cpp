@@ -384,7 +384,7 @@ void Interpreter::_execute()
 			continue;
 		}
 
-		//Окончание группы
+		//Конец группы
 		if (regex_match(code[GI].c_str(), finish_rx))
 		{
 			if (this->call_stack.empty()) throw (std::string)("Call_stack was empty, at line: " + std::to_string(GI+1));

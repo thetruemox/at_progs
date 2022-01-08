@@ -1,7 +1,7 @@
 #pragma once
 #include <list>
 #include <string>
-#include "../Variable.h"
+#include "../Variables/Variable.h"
 
 enum stn_type 
 {

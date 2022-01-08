@@ -2,11 +2,11 @@
 #include <vector>
 #include <regex>
 
-#include "Variable.h"
-#include "Integer.h"
-#include "String.h"
-#include "Pointer.h"
-#include "Array.h"
+#include "Variables/Variable.h"
+#include "Variables/Integer.h"
+#include "Variables/String.h"
+#include "Variables/Pointer.h"
+#include "Variables/Array.h"
 
 #include "Interpreter.h"
 #include "Calculator/ST_Calculator.h"
