@@ -1,15 +1,13 @@
+integer count(integer num)
+start
+num:=num+1;
+return num;
+finish
+
 integer main()
 start
 mutable integer num:=0;
-
-checkzero (num)
-start
-num:=1;
-finish
-instead
-start
-num:=0;
-finish
-
+mutable integer retnum;
+retnum:=call count with (num);
 return 0;
 finish

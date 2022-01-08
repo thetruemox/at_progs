@@ -41,7 +41,7 @@ void Interpreter::_collect()
 	std::regex start_rx("start");
 	std::regex finish_rx("finish");
 	std::regex return_rx("return[ ]((" + name + ")|(.*))[;]");
-	
+
 	std::cmatch cap_gr;
 
 	Function* function = nullptr;
@@ -194,12 +194,20 @@ void Interpreter::_execute()
 	*/
 
 	std::cmatch cg;
+
 	std::regex var_declaration_rx("((mutable)[ ])?(integer|string|pointer<(integer|string)>)[ ]([a-zA-Z][a-zA-Z0-9]*)((;)|:=(.+);)"); //cg[2]=mutable, cg[3]=var_type, cg[4]=pointer_type, cg[5]=var_name, cg[7]=only_declaration, cg[8]=assigment
+	std::regex var_assignment_rx("([a-zA-Z][a-zA-Z0-9]*):=(([a-zA-Z][a-zA-Z0-9]*)|(.+));"); //cg[1]=var_name, cg[3]=variable, cg[4]=expr
+
+	std::regex var_operand("([a-zA-Z][a-zA-Z0-9]*)"); //cg[1]=variable
 	std::regex int_operand("(-?[0-9]+)|([a-zA-Z][a-zA-Z0-9]*)"); //cg[1]=number, cg[2]=variable
 	std::regex str_operand("([\"].+[\"])|([a-zA-Z][a-zA-Z0-9]*)"); //cg[1]=str, cg[2]=variable
-	std::regex var_assignment_rx("([a-zA-Z][a-zA-Z0-9]*):=(([a-zA-Z][a-zA-Z0-9]*)|(.+));"); //cg[1]=var_name, cg[3]=variable, cg[4]=expr
+	
 	std::regex checkzero_rx("checkzero[ ][(](.+)[)]"); //cg[1]=expr
+
 	std::regex finish_rx("finish");
+
+	std::regex fun_call_rx("(([a-zA-Z][a-zA-Z0-9]*):=)?call[ ]([a-zA-Z][a-zA-Z0-9]*)[ ]with[ ][(](.*)[)][;]"); //cg[2]=beneficiary_name, cg[3]=fun_name, cg[4]=args
+	std::regex return_rx("return[ ]((-?[0-9]+)|([\"].+[\"])|([a-zA-Z][a-zA-Z0-9]*));"); //cg[2]=number, cg[3]=str, cg[4]=variable
 
 	Function* cur_context = this->functions["main"]; //Функция, внутри контекста которой работает интерпретатор
 	int GI = this->call_stack.top(); //Глобальный индекс
@@ -283,6 +291,81 @@ void Interpreter::_execute()
 			continue;
 		}
 
+		//Вызов функции
+		if (regex_match(code[GI].c_str(), cg, fun_call_rx))
+		{
+			Function* called_fun = this->functions[cg[3]];
+			if (called_fun == nullptr) throw (std::string)("There is no such function '" + cg[3].str() + "', at line: " + std::to_string(GI + 1));
+
+			//Проверка бенефициара
+			if (cg[2].length() != 0)
+			{
+				Variable* beneficiary = cur_context->get_var(cg[2]);
+				if (beneficiary == nullptr) throw (std::string)("There is no such variable '" + cg[2].str() + "', at line: " + std::to_string(GI + 1));
+				if (beneficiary->get_type() != called_fun->get_ret_type()) throw (std::string)("The return type does not match the variable, at line: " + std::to_string(GI + 1));
+
+				called_fun->set_beneficiary(beneficiary);
+			}
+
+			//Проверка параметров
+			if (cg[4].length() != 0)
+			{
+				std::string value = cg[4];
+				static const std::regex rdelim{ ", " };
+				std::vector<std::string> arg_pairs{
+						std::sregex_token_iterator(value.begin(), value.end(), rdelim, -1),
+						std::sregex_token_iterator()
+				};
+
+				if (arg_pairs.size() != called_fun->get_args_size()) throw (std::string)("Argument list does not match function requirements, at line: " + std::to_string(GI + 1));
+
+				//Передача параметров функции
+				for (int i = 0; i < arg_pairs.size(); i++)
+				{
+					std::cmatch local_cg;
+
+					if (regex_match(arg_pairs[i].c_str(), local_cg, var_operand)) //Переменная
+					{
+						Variable* var_arg = cur_context->get_var(local_cg[1]);
+						if (var_arg == nullptr) throw (std::string)("There is no such variable '" + local_cg[1].str() + "', at line: " + std::to_string(GI + 1));
+
+						switch (var_arg->get_type())
+						{
+						case vt_Integer:
+							called_fun->set_arg(i, dynamic_cast<Integer*>(var_arg)->get_value());
+							break;
+						default:
+							throw (std::string)("This type of argument is not supported (yet?)");
+							break;
+						}
+
+						continue;
+					}
+
+					if (regex_match(arg_pairs[i].c_str(), local_cg, int_operand)) //Число
+					{
+						called_fun->set_arg(i, std::stoi(local_cg[1]));
+					}
+				}
+
+			}
+			else //Параметров нет
+			{
+				if (called_fun->get_args_size() != 0) throw (std::string)("Argument list does not match function requirements, at line: " + std::to_string(GI + 1));
+			}
+
+			//Переход к вызываемой функции
+			this->call_stack.push(GI + 1);
+			GI = called_fun->get_start_i();
+
+			called_fun->set_called_context(cur_context);
+			cur_context = called_fun;
+
+			continue;
+		}
+
+		//Присваивание типа A:=B:=C
+
 		//Присваивание переменной
 		if (regex_match(code[GI].c_str(), cg, var_assignment_rx))
 		{
@@ -327,10 +410,9 @@ void Interpreter::_execute()
 				break;
 			}
 
-			
+			GI++;
+			continue;
 		}
-
-		//Присваивание типа A:=B:=C
 
 		//Условный оператор
 		if (regex_match(code[GI].c_str(), cg, checkzero_rx))
@@ -395,6 +477,44 @@ void Interpreter::_execute()
 		}
 
 		//Возвращаемое значение
+		if (regex_match(code[GI].c_str(), cg, return_rx))
+		{
+			if (cg[2].length() != 0) //Возвращается число
+			{
+				if (cur_context->get_ret_type() != vt_Integer) throw (std::string)("The return type does not match the type of the function, at line: " + std::to_string(GI+1));
+				dynamic_cast<Integer*>(cur_context->get_return_var())->set_value(std::stoi(cg[2]));
+			}
+			else if (cg[3].length() != 0) //Возвращается строка
+			{
+				throw (std::string)("This type of return is not supported (yet?)");
+			}
+			else //Возвращается переменная
+			{
+				Variable* ret_var = cur_context->get_var(cg[4]);
+				if (ret_var == nullptr) throw (std::string)("There is no such variable '" + cg[4].str() + "', at line: " + std::to_string(GI + 1));
+				if (cur_context->get_ret_type() != ret_var->get_type()) throw (std::string)("The return type does not match the type of the function, at line: " + std::to_string(GI + 1));
+				
+				switch (ret_var->get_type())
+				{
+				case vt_Integer:
+					dynamic_cast<Integer*>(cur_context->get_return_var())->set_value(dynamic_cast<Integer*>(ret_var)->get_value());
+					break;
+				default:
+					throw (std::string)("This type of return is not supported (yet?)");
+					break;
+				}
+			}
+
+			cur_context->make_benefit();
+			cur_context = cur_context->get_called_context();
+
+			if (cur_context == nullptr) break; //Return из main, завершение работы программы
+
+			GI = call_stack.top();
+			call_stack.pop();
+
+			continue;
+		}
 
 		GI++; //временный костыль
 	}
