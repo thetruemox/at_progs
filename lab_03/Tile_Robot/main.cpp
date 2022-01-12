@@ -26,13 +26,72 @@ using namespace std;
 *	
 */
 
+int check_top(Robot* rbt)
+{
+	int wall = rbt->top();
+	
+	if (wall == 1)
+	{
+		rbt->time_shift(1);
+		return 1;
+	}
+	else 
+	{
+
+		return 0;
+	}
+}
+
+int check_right(Robot* rbt)
+{
+	int wall = rbt->right();
+
+	if (wall == 1)
+	{
+		rbt->time_shift(1);
+		return 1;
+	}
+	else
+	{
+		return 0;
+	}
+}
+
+int check_bot(Robot* rbt)
+{
+	int wall = rbt->bot();
+
+	if (wall == 1)
+	{
+		rbt->time_shift(1);
+		return 1;
+	}
+	else
+	{
+		return 0;
+	}
+}
+
+int check_left(Robot* rbt)
+{
+	int wall = rbt->left();
+
+	if (wall == 1)
+	{
+		rbt->time_shift(1);
+		return 1;
+	}
+	else
+	{
+		return 0;
+	}
+}
+
 int main()
 {
 	//std::regex str("[\"](.*)[\"]");
-
-	Interpreter ntrptr("robocode.txt");
-
-	/*
+	//Interpreter ntrptr("robocode.txt");
+	
 	Robot rbt("labyrinth.txt");
 	
 	int prev = 3;
@@ -41,18 +100,18 @@ int main()
 		//вектор вниз
 		if (prev == 3)
 		{
-			while (!rbt.left())
+			while (!check_left(&rbt))
 			{
 				if (!rbt.bot()) break;
 			}
 
-			if (rbt.right())
-			{
-				prev = 2;
-			} 
-			else if (rbt.left())
+			if (rbt.left())
 			{
 				prev = 4;
+			} 
+			else if (rbt.right())
+			{
+				prev = 2;
 			}
 			else
 			{
@@ -63,7 +122,7 @@ int main()
 		//вектор влево
 		if (prev == 4)
 		{
-			while (!rbt.top())
+			while (!check_top(&rbt))
 			{
 				if (!rbt.left()) break;
 			}
@@ -85,7 +144,7 @@ int main()
 		//вектор вправо
 		if (prev == 2)
 		{
-			while (!rbt.bot())
+			while (!check_bot(&rbt))
 			{
 				if (!rbt.right()) break;
 			}
@@ -107,7 +166,7 @@ int main()
 		//вектор вверх
 		if (prev == 1)
 		{
-			while (!rbt.right())
+			while (!check_right(&rbt))
 			{
 				if (!rbt.top()) break;
 			}
@@ -126,6 +185,6 @@ int main()
 			}
 		}
 	}
-	*/
+	
     return 0;
 }
