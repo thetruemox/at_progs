@@ -342,3 +342,4 @@ healthchecksdb
 *.filters
 /lab_03/Tile_Robot/Tile_Robot.sln
 /lab_03/Tile_Robot/godhelpme.txt
+/lab_03/Tile_Robot/Robot/text.txt

@@ -15,8 +15,13 @@
 
 using namespace std;
 
-/* Идеи
-* 
+/* todo
+* Использование методов перемещения робота в: 
+*	1. Объявлении переменной
+*	2. Присвоении переменной
+*	3. Условном операторе
+* Вызов функции в условии цикла while
+* Перевести код алгоритма робота с С++ на Robocode
 */
 
 /* Баги (Фичи?)
@@ -89,9 +94,9 @@ int check_left(Robot* rbt)
 
 int main()
 {
-	//std::regex str("[\"](.*)[\"]");
-	//Interpreter ntrptr("robocode.txt");
+	Interpreter ntrptr("robocode.txt");
 	
+	/*
 	Robot rbt("labyrinth.txt");
 	
 	int prev = 3;
@@ -185,6 +190,6 @@ int main()
 			}
 		}
 	}
-	
+	*/
     return 0;
 }

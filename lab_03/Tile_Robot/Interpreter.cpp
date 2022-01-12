@@ -206,6 +206,7 @@ void Interpreter::_execute()
 	std::regex while_rx("while[ ][(](.+)[)]"); //cg[1]=expr
 
 	std::regex finish_rx("finish");
+	std::regex break_rx("break;");
 
 	std::regex fun_call_rx("(([a-zA-Z][a-zA-Z0-9]*):=)?call[ ]([a-zA-Z][a-zA-Z0-9]*)[ ]with[ ][(](.*)[)][;]"); //cg[2]=beneficiary_name, cg[3]=fun_name, cg[4]=args
 	std::regex return_rx("return[ ]((-?[0-9]+)|([\"].+[\"])|([a-zA-Z][a-zA-Z0-9]*));"); //cg[2]=number, cg[3]=str, cg[4]=variable
@@ -291,7 +292,7 @@ void Interpreter::_execute()
 			GI++;
 			continue;
 		}
-
+		
 		//Вызов функции
 		if (regex_match(code[GI].c_str(), cg, fun_call_rx))
 		{
@@ -544,6 +545,42 @@ void Interpreter::_execute()
 			else 
 			{
 				GI = while_end_i; //Переход на finish в конце while`a, чтобы освободить call_stack
+			}
+
+			continue;
+		}
+
+		//Break (Нет проверки на ошибку "Break out of cycle")
+		if (regex_match(code[GI].c_str(), break_rx))
+		{
+			if (this->call_stack.empty()) throw (std::string)("Call_stack was empty, at line: " + std::to_string(GI + 1));
+			GI = call_stack.top();
+			call_stack.pop();
+
+			//Ищем конец while`а
+			GI++; //От while переходим к start
+			int finish_order = 1;
+			while (1)
+			{
+				GI++;
+				if (code[GI] == "start") finish_order++;
+
+				if (code[GI] == "finish" && finish_order == 1)
+				{
+					if (code[GI + 1] == "instead")
+					{
+						GI += 2; //Пропускаем instead и start, чтобы продолжить поиски конца while`a
+					}
+					else
+					{
+						call_stack.push(GI + 1); //Конец while`a
+						break;
+					}
+				}
+				else if (code[GI] == "finish" && finish_order > 1)
+				{
+					finish_order--;
+				}
 			}
 
 			continue;

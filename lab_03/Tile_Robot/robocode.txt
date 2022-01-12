@@ -1,15 +1,10 @@
 integer main()
 start
-mutable integer a:=0;
-
-while (a<1)
+mutable integer a:=1;
+while (a<3)
 start
 a:=a+1;
+break;
 finish
-instead
-start
-a:=a+1;
-finish
-
 return 0;
 finish
