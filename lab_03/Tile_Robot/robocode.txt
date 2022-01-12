@@ -1,13 +1,15 @@
-integer count(integer num)
-start
-num:=num+1;
-return num;
-finish
-
 integer main()
 start
-mutable integer num:=0;
-mutable integer retnum;
-retnum:=call count with (num);
+mutable integer a:=0;
+
+while (a<1)
+start
+a:=a+1;
+finish
+instead
+start
+a:=a+1;
+finish
+
 return 0;
 finish

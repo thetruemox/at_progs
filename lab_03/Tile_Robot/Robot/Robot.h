@@ -1,20 +1,33 @@
 #pragma once
-
-/*
-* –обот ставит стены на местах встреченых тупиков
-* 
-* –обот двигаетс€ в одну сторону до упора и как встречает стену
-* выбирает следующее направление из приоритета, кроме обратного 
-* тому что он выполн€л
-* 
-* “упик - это место из которого нет иного выхода кроме как обратного
-*/
+#include <string>
+#include <vector>
+#include <stack>
+#include <fstream>
+#include <iostream>
+#include <Windows.h>
 
 class Robot
 {
 public:
-	
+	Robot(std::string file_name);
 
+	int top();
+	int bot();
+	int left();
+	int right();
+	void place_wall(); //—тавит стену и перемещаетс€ на предыдущую клетку (Ќе актуальный метод)
+	void time_shift(int offset);
+
+	void draw();
+	int is_win(); //1 Ц если робот достиг выхода, 0 Ц в остальных случа€х
 private:
+	int win; //1 Ц если робот достиг выхода, 0 Ц в остальных случа€х
 
+	std::pair<int, int> XY_enter; // оординаты начала движени€ робота
+	std::pair<int, int> XY_exit; // оординаты выхода из лабиринта
+	std::pair<int, int> XY_cur; // оординаты положени€ робота
+
+	std::stack<std::pair<int, int>> move_memory;
+
+	std::vector<std::string> labyrinth; 
 };

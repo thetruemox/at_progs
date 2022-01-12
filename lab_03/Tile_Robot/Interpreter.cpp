@@ -203,6 +203,7 @@ void Interpreter::_execute()
 	std::regex str_operand("([\"].+[\"])|([a-zA-Z][a-zA-Z0-9]*)"); //cg[1]=str, cg[2]=variable
 	
 	std::regex checkzero_rx("checkzero[ ][(](.+)[)]"); //cg[1]=expr
+	std::regex while_rx("while[ ][(](.+)[)]"); //cg[1]=expr
 
 	std::regex finish_rx("finish");
 
@@ -429,11 +430,15 @@ void Interpreter::_execute()
 			int checkzero_i = GI; //Индекс оператора checkzero
 			int instead_i = -1; //Индекс оператора instead
 			int finish_i = -1; //Индекс конца условного оператора
+			int finish_order = 1; //Порядок встречаемого finish, используется для работы других групп языка внутри условного оператора
 
+			GI++; //Чтобы не проверять еще раз start
 			while (1)
 			{
 				GI++;
-				if (code[GI] == "finish")
+				if (code[GI] == "start") finish_order++;
+
+				if (code[GI] == "finish" && finish_order == 1)
 				{
 					if (code[GI + 1] == "instead")
 					{
@@ -446,6 +451,10 @@ void Interpreter::_execute()
 						break;
 					}
 				}
+				else if (code[GI] == "finish" && finish_order > 1)
+				{
+					finish_order--;
+				}
 			}
 
 			ST_Calculator int_calculator(cg[1]);
@@ -457,13 +466,86 @@ void Interpreter::_execute()
 				GI = checkzero_i + 2;
 				this->call_stack.push(finish_i + 1);
 			}
-			else
+			else if (instead_i != -1)
 			{
 				GI = instead_i + 2;
 				this->call_stack.push(finish_i + 1);
 			}
+			else
+			{
+				GI = finish_i;
+				this->call_stack.push(finish_i + 1);
+			}
 
 			delete result;
+			continue;
+		}
+
+		//Цикл while
+		if (regex_match(code[GI].c_str(), cg, while_rx))
+		{
+			//Если существует start, то _collect гарантирует наличие finish
+			if (code[GI + 1] != "start") throw (std::string)("Expected 'start', at line: " + std::to_string(GI + 2));
+
+			/*
+			* Если выражение равно 1, то в call_stack заносится GI начала while
+			* Выполняется тело цикла до finish, после переходит снова на проверку 
+			* Если выражение равно 0, то ищется и выполняется блок instead
+			* GI переводится на конец while
+			*/
+
+			ST_Calculator int_calculator(cg[1]);
+			Integer* result = new Integer("result");
+			int_calculator.calculate(result, cur_context, int_calculator.get_root());
+
+			if (result->get_value() == 1) //Если условие выполняется, то работает с телом цикла
+			{
+				call_stack.push(GI);
+				GI+=2; //Переход к телу цикла
+				delete result;
+				continue;
+			}
+
+			//Если не подходит, то ищем instead или конец while`а
+			GI++; //От while переходим к start
+			int finish_order = 1;
+			int instead_i = -1; //GI instead`a, на случай если найдется
+			int while_end_i = -1;
+			while (1)
+			{
+				GI++;
+				if (code[GI] == "start") finish_order++;
+
+				if (code[GI] == "finish" && finish_order == 1)
+				{
+					if (code[GI + 1] == "instead")
+					{
+						if (code[GI + 2] != "start") throw (std::string)("Expected 'start', at line: " + std::to_string(GI + 3));		
+						instead_i = GI + 1;
+						GI += 2; //Пропускаем instead и start, чтобы продолжить поиски конца while`a
+					}
+					else
+					{
+						while_end_i = GI;
+						call_stack.push(GI + 1); //Конец while`a
+						break;
+					}
+				}
+				else if (code[GI] == "finish" && finish_order > 1)
+				{
+					finish_order--;
+				}
+			}
+
+			if (instead_i != -1) //Нашелся instead, выполняем
+			{
+				GI = instead_i + 2; //Сумма для перехода от instead к его телу
+			}
+			else 
+			{
+				GI = while_end_i; //Переход на finish в конце while`a, чтобы освободить call_stack
+			}
+
 			continue;
 		}
 
