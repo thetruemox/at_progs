@@ -11,6 +11,7 @@
 #include "Variables/Variable.h"
 #include "Variables/String.h"
 #include "Variables/Pointer.h"
+#include "Robot/Robot.h"
 
 class Interpreter
 {
@@ -21,19 +22,16 @@ public:
 	* и
 	* Execute (выполняет код внутри функций)
 	*/
-
-	Interpreter(std::string file_name);
+	Interpreter(std::string robocode_file, std::string labyrinth_file);
 
 private:
-	/*
-	* В этом стеке находится номер позиции в коде, к которой 
-	* необходимо вернуться в случае встречи return или начала 
-	* программы
-	*/
-	std::stack<int> call_stack; 
+	//В этом стеке находится номер позиции в коде, к которой необходимо вернуться в случае встречи return, finish или начала программы
+	std::stack<int> call_stack;
 
 	std::vector<std::string> code;
 	std::map<std::string, Function*> functions;
+
+	Robot* robot;
 
 	void _collect();
 	void _execute();

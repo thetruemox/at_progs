@@ -1,10 +1,20 @@
 integer main()
 start
-mutable integer a:=1;
-while (a<3)
-start
-a:=a+1;
-break;
-finish
+bot
+bot
+bot
+left
+left
+left
+left
+left
+left
+left
+left
+top
+top
+top
+right
+right
 return 0;
 finish

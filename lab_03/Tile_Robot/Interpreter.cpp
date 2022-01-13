@@ -1,16 +1,18 @@
 #include "Interpreter.h"
 
 
-Interpreter::Interpreter(std::string file_name)
+Interpreter::Interpreter(std::string robocode_file, std::string labyrinth_file)
 {
-	std::ifstream file(file_name);
-	if (!file.is_open()) throw("File not found!");
+	std::ifstream file(robocode_file);
+	if (!file.is_open()) throw (std::string)("File not found!");
 
 	std::string t_line;
 	while (getline(file, t_line))
 	{
 		this->code.push_back(t_line);
 	}
+
+	this->robot = new Robot(labyrinth_file);
 
 	try
 	{
@@ -211,6 +213,8 @@ void Interpreter::_execute()
 	std::regex fun_call_rx("(([a-zA-Z][a-zA-Z0-9]*):=)?call[ ]([a-zA-Z][a-zA-Z0-9]*)[ ]with[ ][(](.*)[)][;]"); //cg[2]=beneficiary_name, cg[3]=fun_name, cg[4]=args
 	std::regex return_rx("return[ ]((-?[0-9]+)|([\"].+[\"])|([a-zA-Z][a-zA-Z0-9]*));"); //cg[2]=number, cg[3]=str, cg[4]=variable
 
+	std::regex robo_methods_rx("(top)|(right)|(bot)|(left)|(timeshift[(](-?[0-9]+)[)])"); //cg[1]=top, cg[2]=right, cg[3]=bot, cg[4]=left, cg[5]=timeshift, cg[6]=timeshift_arg
+
 	Function* cur_context = this->functions["main"]; //Функция, внутри контекста которой работает интерпретатор
 	int GI = this->call_stack.top(); //Глобальный индекс
 	this->call_stack.pop();
@@ -228,7 +232,8 @@ void Interpreter::_execute()
 					if (cg[7].length() != 0) throw (std::string)("Constant value not set, at line: " + std::to_string(GI+1));
 
 					std::cmatch local_cg;
-					std::string tmp_crutch = cg[8]; 
+					std::string tmp_crutch = cg[8]; 			
+
 					if (regex_match(tmp_crutch.c_str(), local_cg, int_operand)) //Проверка на одиночную переменную или просто число
 					{
 						if (local_cg[1].length() != 0) //number
@@ -255,6 +260,44 @@ void Interpreter::_execute()
 				}
 				else //Это переменная и ее инициализация опциональна
 				{
+					//Проверка на использование метода робота
+					std::string tmp_crutch = cg[8];
+					std::cmatch local_cg;
+					if (regex_match(tmp_crutch.c_str(), local_cg, robo_methods_rx))
+					{
+						if (local_cg[1].length() != 0) //top
+						{
+							Integer* new_var = new Integer(cg[5]);
+							cur_context->add_var(new_var);
+							new_var->set_value(this->robot->top());
+						}
+						else if (local_cg[2].length() != 0) //right
+						{
+							Integer* new_var = new Integer(cg[5]);
+							cur_context->add_var(new_var);
+							new_var->set_value(this->robot->right());
+						}
+						else if (local_cg[3].length() != 0) //bot
+						{
+							Integer* new_var = new Integer(cg[5]);
+							cur_context->add_var(new_var);
+							new_var->set_value(this->robot->bot());
+						}
+						else if (local_cg[4].length() != 0) //left
+						{
+							Integer* new_var = new Integer(cg[5]);
+							cur_context->add_var(new_var);
+							new_var->set_value(this->robot->left());
+						}
+						else //timeshift
+						{
+							throw (std::string)("Timeshift doesn`t return any value");
+						}
+
+						GI++;
+						continue;
+					}
+
 					Integer* new_var = new Integer(cg[5]);
 					cur_context->add_var(new_var);
 
@@ -374,6 +417,39 @@ void Interpreter::_execute()
 		{
 			Integer* orig_var;
 			Integer* fun_var;
+
+			//Проверка на использование метода робота
+			std::string crutch = cg[3];
+			std::cmatch local_cg;
+			if (regex_match(crutch.c_str(), local_cg, robo_methods_rx))
+			{
+				orig_var = dynamic_cast<Integer*>(cur_context->get_var(cg[1]));
+
+				if (local_cg[1].length() != 0) //top
+				{
+					orig_var->set_value(this->robot->top());
+				}
+				else if (local_cg[2].length() != 0) //right
+				{
+					orig_var->set_value(this->robot->right());
+				}
+				else if (local_cg[3].length() != 0) //bot
+				{
+					orig_var->set_value(this->robot->bot());
+				}
+				else if (local_cg[4].length() != 0) //left
+				{
+					orig_var->set_value(this->robot->left());
+				}
+				else //timeshift
+				{
+					throw (std::string)("Timeshift doesn`t return any value");
+				}
+
+				GI++;
+				continue;
+			}
+
 			switch (cur_context->get_var(cg[1])->get_type())
 			{
 			case vt_Integer:
@@ -636,7 +712,43 @@ void Interpreter::_execute()
 			continue;
 		}
 
-		GI++; //временный костыль
+		//Команды робота
+		if (regex_match(code[GI].c_str(), cg, robo_methods_rx))
+		{
+			if (cg[1].length() != 0) //top
+			{
+				Integer* new_var = new Integer(cg[5]);
+				cur_context->add_var(new_var);
+				new_var->set_value(this->robot->top());
+			}
+			else if (cg[2].length() != 0) //right
+			{
+				Integer* new_var = new Integer(cg[5]);
+				cur_context->add_var(new_var);
+				new_var->set_value(this->robot->right());
+			}
+			else if (cg[3].length() != 0) //bot
+			{
+				Integer* new_var = new Integer(cg[5]);
+				cur_context->add_var(new_var);
+				new_var->set_value(this->robot->bot());
+			}
+			else if (cg[4].length() != 0) //left
+			{
+				Integer* new_var = new Integer(cg[5]);
+				cur_context->add_var(new_var);
+				new_var->set_value(this->robot->left());
+			}
+			else //timeshift
+			{
+				this->robot->time_shift(std::stoi(cg[6]));
+			}
+
+			GI++;
+			continue;
+		}
+
+		GI++; //Временно(?), по факту пропускает строку если интерпретатор никак ее не обработал 
 	}
 
 }

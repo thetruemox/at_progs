@@ -17,10 +17,10 @@ using namespace std;
 
 /* todo
 * Использование методов перемещения робота в: 
-*	1. Объявлении переменной
-*	2. Присвоении переменной
+*	1. Объявлении переменной X
+*	2. Присвоении переменной X
 *	3. Условном операторе
-* Вызов функции в условии цикла while
+*	4. Отдельно в коде X
 * Перевести код алгоритма робота с С++ на Robocode
 */
 
@@ -94,20 +94,23 @@ int check_left(Robot* rbt)
 
 int main()
 {
-	Interpreter ntrptr("robocode.txt");
+	Interpreter ntrptr("robocode.txt", "labyrinth.txt");
 	
 	/*
 	Robot rbt("labyrinth.txt");
 	
 	int prev = 3;
+	int tmp;
 	while(!rbt.is_win())
 	{
 		//вектор вниз
 		if (prev == 3)
 		{
-			while (!check_left(&rbt))
+		    tmp = check_left(&rbt);
+			while (!tmp)
 			{
 				if (!rbt.bot()) break;
+				tmp = check_left(&rbt);
 			}
 
 			if (rbt.left())
