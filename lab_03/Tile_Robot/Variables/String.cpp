@@ -7,6 +7,14 @@ String::String(std::string var_name)
     this->is_mutable = true;
 }
 
+String::String(std::string var_name, std::string value)
+{
+    this->name = var_name;
+    this->type = vt_String;
+    this->is_mutable = false;
+    this->value = value;
+}
+
 var_type String::get_type()
 {
     return this->type;

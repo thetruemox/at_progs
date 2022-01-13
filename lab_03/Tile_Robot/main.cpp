@@ -91,7 +91,7 @@ int check_left(Robot* rbt)
 
 int main()
 {
-	Interpreter ntrptr("robocode.txt", "labyrinth.txt");
+	Interpreter ntrptr("str_test.txt", "labyrinth.txt");
 	
 	/*
 	Robot rbt("labyrinth.txt");

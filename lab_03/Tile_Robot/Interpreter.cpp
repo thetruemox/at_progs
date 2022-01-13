@@ -333,6 +333,55 @@ void Interpreter::_execute()
 					}
 				}
 			}
+			else if (cg[3] == "string")
+			{
+				if (cg[2].length() == 0) //Это константа и ее необходимо инициализировать
+				{
+					if (cg[7].length() != 0) throw (std::string)("Constant value not set, at line: " + std::to_string(GI + 1));
+
+					std::cmatch local_cg;
+					std::string tmp_crutch = cg[8];
+					if (regex_match(tmp_crutch.c_str(), local_cg, str_operand)) //Проверка на одиночную переменную или просто строку
+					{
+						if (local_cg[1].length() != 0) //str
+						{
+							cur_context->add_var(new String(cg[5], local_cg[1]));
+						}
+						else //variable
+						{
+							String* ref_var = dynamic_cast<String*>(cur_context->get_var(local_cg[2]));
+							if (ref_var == nullptr) throw (std::string)("Incompatible types, at line: " + std::to_string(GI + 1));
+
+							cur_context->add_var(new String(cg[5], ref_var->get_value()));
+						}
+					}
+				}
+				else //Это переменная и ее инициализация опциональна
+				{
+					String* new_var = new String(cg[5]);
+					cur_context->add_var(new_var);
+
+					if (cg[7].length() == 0) //Тогда присутствует инициализация
+					{
+						std::cmatch local_cg;
+						std::string tmp_crutch = cg[8];
+						if (regex_match(tmp_crutch.c_str(), local_cg, str_operand)) //Проверка на одиночную переменную или просто строку
+						{
+							if (local_cg[1].length() != 0) //str
+							{
+								new_var->set_value(local_cg[1]);
+							}
+							else //variable
+							{
+								String* ref_var = dynamic_cast<String*>(cur_context->get_var(local_cg[2]));
+								if (ref_var == nullptr) throw (std::string)("Incompatible types, at line: " + std::to_string(GI + 1));
+
+								new_var->set_value(ref_var->get_value());
+							}
+						}
+					}
+				}
+			}
 
 			GI++;
 			continue;
@@ -415,8 +464,8 @@ void Interpreter::_execute()
 		//Присваивание переменной
 		if (regex_match(code[GI].c_str(), cg, var_assignment_rx))
 		{
-			Integer* orig_var;
-			Integer* fun_var;
+			Variable* orig_var;
+			Variable* fun_var;
 
 			//Проверка на использование метода робота
 			std::string crutch = cg[3];
@@ -424,22 +473,23 @@ void Interpreter::_execute()
 			if (regex_match(crutch.c_str(), local_cg, robo_methods_rx))
 			{
 				orig_var = dynamic_cast<Integer*>(cur_context->get_var(cg[1]));
+				if (orig_var == nullptr) throw (std::string)("Incompatible types, at line: " + std::to_string(GI + 1));
 
 				if (local_cg[1].length() != 0) //top
 				{
-					orig_var->set_value(this->robot->top());
+					dynamic_cast<Integer*>(orig_var)->set_value(this->robot->top());
 				}
 				else if (local_cg[2].length() != 0) //right
 				{
-					orig_var->set_value(this->robot->right());
+					dynamic_cast<Integer*>(orig_var)->set_value(this->robot->right());
 				}
 				else if (local_cg[3].length() != 0) //bot
 				{
-					orig_var->set_value(this->robot->bot());
+					dynamic_cast<Integer*>(orig_var)->set_value(this->robot->bot());
 				}
 				else if (local_cg[4].length() != 0) //left
 				{
-					orig_var->set_value(this->robot->left());
+					dynamic_cast<Integer*>(orig_var)->set_value(this->robot->left());
 				}
 				else //timeshift
 				{
@@ -459,7 +509,7 @@ void Interpreter::_execute()
 				if (cg[3].length() != 0) //Переменная
 				{
 					fun_var = dynamic_cast<Integer*>(cur_context->get_var(cg[3]));
-					orig_var->set_value(fun_var->get_value());
+					dynamic_cast<Integer*>(orig_var)->set_value(dynamic_cast<Integer*>(fun_var)->get_value());
 				}
 				else if (cg[4].length() != 0) //Число или выражение
 				{
@@ -469,20 +519,41 @@ void Interpreter::_execute()
 
 					if (local_cg[1].length() != 0) //Число
 					{
-						orig_var->set_value(std::stoi(local_cg[1]));
+						dynamic_cast<Integer*>(orig_var)->set_value(std::stoi(local_cg[1]));
 					}
 					else //Выражение
 					{
 						Integer* result = new Integer("result");
 						ST_Calculator int_calculator(crutch);
 						int_calculator.calculate(result, cur_context, int_calculator.get_root());
-						orig_var->set_value(result->get_value());
+						dynamic_cast<Integer*>(orig_var)->set_value(result->get_value());
 						delete result;
 					}
 				}
 
 				break;
 			case vt_String:
+				orig_var = dynamic_cast<String*>(cur_context->get_var(cg[1]));
+				fun_var = nullptr;
+
+				if (cg[3].length() != 0) //Переменная
+				{
+					fun_var = dynamic_cast<Integer*>(cur_context->get_var(cg[3]));
+					dynamic_cast<String*>(orig_var)->set_value(dynamic_cast<String*>(fun_var)->get_value());
+				}
+				else if (cg[4].length() != 0) //Строка
+				{
+					std::cmatch local_cg;
+					std::string crutch = cg[4];
+					regex_match(crutch.c_str(), local_cg, str_operand);
+
+					if (local_cg[1].length() != 0) //Строка
+					{
+						dynamic_cast<String*>(orig_var)->set_value(local_cg[1]);
+					}
+					else throw (std::string)("Attempt to assign an unknown value to a string, at line: " + std::to_string(GI + 1));
+				}
+
 				break;
 			default:
 				throw (std::string)("This type not supported, at line: " + std::to_string(GI+1));
@@ -719,7 +790,8 @@ void Interpreter::_execute()
 			}
 			else if (cg[3].length() != 0) //Возвращается строка
 			{
-				throw (std::string)("This type of return is not supported (yet?)");
+				if (cur_context->get_ret_type() != vt_String) throw (std::string)("The return type does not match the type of the function, at line: " + std::to_string(GI + 1));
+				dynamic_cast<String*>(cur_context->get_return_var())->set_value(cg[2]);
 			}
 			else //Возвращается переменная
 			{
@@ -732,8 +804,11 @@ void Interpreter::_execute()
 				case vt_Integer:
 					dynamic_cast<Integer*>(cur_context->get_return_var())->set_value(dynamic_cast<Integer*>(ret_var)->get_value());
 					break;
+				case vt_String:
+					dynamic_cast<String*>(cur_context->get_return_var())->set_value(dynamic_cast<String*>(ret_var)->get_value());
+					break;
 				default:
-					throw (std::string)("This type of return is not supported (yet?)");
+					throw (std::string)("This type of return is not supported (yet?), at line: " + std::to_string(GI + 1));
 					break;
 				}
 			}
@@ -787,6 +862,18 @@ void Interpreter::_execute()
 
 		GI++; //Временно(?), по факту пропускает строку если интерпретатор никак ее не обработал 
 		//std::cout << code[GI] << std::endl;
+	}
+
+	if (robot->is_win())
+	{
+		std::cout << "The robot got out of the labyrinth!" << std::endl;
+	}
+	else
+	{
+		//Обычно функция main возвращает int, но для отладки и экспериментов можно поставить case на большее число типов
+
+		std::cout << "Function main returned " + std::to_string(dynamic_cast<Integer*>(this->functions["main"]->get_return_var())->get_value());
+		//std::cout << "Function main returned " + dynamic_cast<String*>(this->functions["main"]->get_return_var())->get_value();
 	}
 
 }

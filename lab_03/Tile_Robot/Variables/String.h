@@ -4,7 +4,10 @@
 class String : virtual public Variable
 {
 public:
+	//При этом объявлении создается переменная
 	String(std::string var_name);
+	//При этом объявлении создается константа
+	String(std::string var_name, std::string value);
 	var_type get_type() override;
 	std::string get_name() override;
 
