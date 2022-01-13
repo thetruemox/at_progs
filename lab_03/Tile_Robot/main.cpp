@@ -16,12 +16,7 @@
 using namespace std;
 
 /* todo
-* Использование методов перемещения робота в: 
-*	1. Объявлении переменной X
-*	2. Присвоении переменной X
-*	3. Условном операторе
-*	4. Отдельно в коде X
-* Перевести код алгоритма робота с С++ на Robocode
+* 
 */
 
 /* Баги (Фичи?)
@@ -31,6 +26,7 @@ using namespace std;
 *	
 */
 
+/*
 int check_top(Robot* rbt)
 {
 	int wall = rbt->top();
@@ -91,6 +87,7 @@ int check_left(Robot* rbt)
 		return 0;
 	}
 }
+*/
 
 int main()
 {

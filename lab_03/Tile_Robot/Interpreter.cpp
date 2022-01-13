@@ -65,7 +65,7 @@ void Interpreter::_collect()
 			if (this->functions[cap_gr[4]] != nullptr) throw ("Function '" + cap_gr[4].str() + "' alredy exists, at line: " + std::to_string(i+1));
 			if (code[i + 1] != "start") throw ("Expected 'start', after function declaration, at line: " + std::to_string(i+1));
 			exp_stack.push("finish");
-			exp_stack.push("return");
+			//exp_stack.push("return");
 
 			//Определение типа и имени функции
 			if (cap_gr[2].length() != 0 && cap_gr[3].length() != 0)
@@ -169,6 +169,7 @@ void Interpreter::_collect()
 			continue;
 		}
 
+		/*
 		if (regex_match(code[i].c_str(), return_rx))
 		{
 			if (!exp_stack.empty() && exp_stack.top() != "return") throw ("Expected 'return', at line: " + std::to_string(i+1));
@@ -176,6 +177,7 @@ void Interpreter::_collect()
 			exp_stack.pop();
 			continue;
 		}
+		*/
 	}
 
 	if (!exp_stack.empty()) throw "Error '" + exp_stack.top() + "' excpected somewhere";
@@ -219,8 +221,8 @@ void Interpreter::_execute()
 	int GI = this->call_stack.top(); //Глобальный индекс
 	this->call_stack.pop();
 
-	//Каждый парсер самостоятельно двигает GI
-	while (true)
+	//Каждый парсер самостоятельно двигает GI, цикл завершается при достижении return функции main или при выходе робота из лабиринта
+	while (!robot->is_win())
 	{
 		//Объявление переменной
 		if (regex_match(code[GI].c_str(), cg, var_declaration_rx))
@@ -410,8 +412,6 @@ void Interpreter::_execute()
 			continue;
 		}
 
-		//Присваивание типа A:=B:=C
-
 		//Присваивание переменной
 		if (regex_match(code[GI].c_str(), cg, var_assignment_rx))
 		{
@@ -521,6 +521,7 @@ void Interpreter::_execute()
 					{
 						if (code[GI + 2] != "start") throw (std::string)("Expected 'start', at line: " + std::to_string(GI + 3));
 						instead_i = GI + 1;
+						GI += 2; //Пропуск instead и его start, для последующей обработки
 					}
 					else
 					{ 
@@ -534,9 +535,38 @@ void Interpreter::_execute()
 				}
 			}
 
-			ST_Calculator int_calculator(cg[1]);
 			Integer* result = new Integer("result");
-			int_calculator.calculate(result, cur_context, int_calculator.get_root());
+
+			std::string crutch = cg[1];
+			std::cmatch local_cg;
+			if (regex_match(crutch.c_str(), local_cg, robo_methods_rx))
+			{
+				if (local_cg[1].length() != 0) //top
+				{
+					result->set_value(this->robot->top());
+				}
+				else if (local_cg[2].length() != 0) //right
+				{
+					result->set_value(this->robot->right());
+				}
+				else if (local_cg[3].length() != 0) //bot
+				{
+					result->set_value(this->robot->bot());
+				}
+				else if (local_cg[4].length() != 0) //left
+				{
+					result->set_value(this->robot->left());
+				}
+				else //timeshift
+				{
+					throw (std::string)("Timeshift doesn`t return any value");
+				}
+			}
+			else 
+			{
+				ST_Calculator int_calculator(cg[1]);
+				int_calculator.calculate(result, cur_context, int_calculator.get_root());
+			}
 
 			if (result->get_value() == 0)
 			{
@@ -630,7 +660,14 @@ void Interpreter::_execute()
 		if (regex_match(code[GI].c_str(), break_rx))
 		{
 			if (this->call_stack.empty()) throw (std::string)("Call_stack was empty, at line: " + std::to_string(GI + 1));
+
 			GI = call_stack.top();
+			while (!regex_match(code[GI].c_str(), while_rx))
+			{
+				call_stack.pop();
+				GI = call_stack.top();
+			}
+
 			call_stack.pop();
 
 			//Ищем конец while`а
@@ -749,6 +786,7 @@ void Interpreter::_execute()
 		}
 
 		GI++; //Временно(?), по факту пропускает строку если интерпретатор никак ее не обработал 
+		//std::cout << code[GI] << std::endl;
 	}
 
 }

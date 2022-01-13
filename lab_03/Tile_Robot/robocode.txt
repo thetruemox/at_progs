@@ -1,20 +1,183 @@
+integer checkTop()
+start
+checkzero (top)
+start
+return 0;
+finish
+instead
+start
+timeshift(1)
+return 1;
+finish
+finish
+
+integer checkRight()
+start
+checkzero (right)
+start
+return 0;
+finish
+instead
+start
+timeshift(1)
+return 1;
+finish
+finish
+
+integer checkBot()
+start
+checkzero (bot)
+start
+return 0;
+finish
+instead
+start
+timeshift(1)
+return 1;
+finish
+finish
+
+integer checkLeft()
+start
+checkzero (left)
+start
+return 0;
+finish
+instead
+start
+timeshift(1)
+return 1;
+finish
+finish
+
 integer main()
 start
-bot
-bot
-bot
-left
-left
-left
-left
-left
-left
-left
-left
-top
-top
-top
-right
-right
+mutable integer prev:=3;
+mutable integer tmp;
+
+while (1)
+start
+
+checkzero (prev=3)
+start
+finish
+instead
+start
+tmp:=call checkLeft with ();
+while (tmp=0)
+start
+checkzero (bot)
+start
+break;
+finish
+tmp:=call checkLeft with ();
+finish
+prev:=1;
+tmp:=left;
+checkzero (tmp=0)
+start
+prev:=4;
+finish
+instead
+start
+tmp:=right;
+checkzero (tmp=0)
+start
+prev:=2;
+finish
+finish
+finish
+
+checkzero (prev=4)
+start
+finish
+instead
+start
+tmp:=call checkTop with ();
+while (tmp=0)
+start
+checkzero (left)
+start
+break;
+finish
+tmp:=call checkTop with ();
+finish
+prev:=2;
+tmp:=top;
+checkzero (tmp=0)
+start
+prev:=1;
+finish
+instead
+start
+tmp:=bot;
+checkzero (tmp=0)
+start
+prev:=3;
+finish
+finish
+finish
+
+checkzero (prev=2)
+start
+finish
+instead
+start
+tmp:=call checkBot with ();
+while (tmp=0)
+start
+checkzero (right)
+start
+break;
+finish
+tmp:=call checkBot with ();
+finish
+prev:=4;
+tmp:=bot;
+checkzero (tmp=0)
+start
+prev:=3;
+finish
+instead
+start
+tmp:=top;
+checkzero (tmp=0)
+start
+prev:=1;
+finish
+finish
+finish
+
+checkzero (prev=1)
+start
+finish
+instead
+start
+tmp:=call checkRight with ();
+while (tmp=0)
+start
+checkzero (top)
+start
+break;
+finish
+tmp:=call checkRight with ();
+finish
+prev:=3;
+tmp:=right;
+checkzero (tmp=0)
+start
+prev:=2;
+finish
+instead
+start
+tmp:=left;
+checkzero (tmp=0)
+start
+prev:=4;
+finish
+finish
+finish
+finish
+
 return 0;
 finish
