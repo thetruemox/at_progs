@@ -16,7 +16,8 @@
 using namespace std;
 
 /* todo
-* Пример с рекурсией
+* Фиббоначи 
+* 
 * 15:30
 */
 
@@ -36,7 +37,9 @@ int main()
 	//Тест с математическим выражением
 	//Interpreter ntrptr("math_test.txt", "labyrinth.txt");
 	//Тест с конкатенацией строк
-	Interpreter ntrptr("str_test.txt", "labyrinth.txt");
+	//Interpreter ntrptr("str_test.txt", "labyrinth.txt");
+	//Тест с числами Фибоначчи
+	Interpreter ntrptr("fibonacci_test.txt", "labyrinth.txt");
 
     return 0;
 }

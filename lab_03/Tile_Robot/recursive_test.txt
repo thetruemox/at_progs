@@ -16,7 +16,7 @@ finish
 
 integer main()
 start
-mutable integer res:=1;
+mutable integer res:=3;
 res:=call foo with (res);
 return res;
 finish

@@ -1,0 +1,39 @@
+integer fib(integer n)
+start
+
+checkzero (n=0)
+start
+finish
+instead
+start
+return 0;
+finish
+
+checkzero (n=1)
+start
+finish
+instead
+start
+return 1;
+finish
+
+mutable integer arg1:=n-1;
+mutable integer arg2:=n-2;
+
+mutable integer ret1;
+mutable integer ret2;
+
+ret1:=call fib with (arg1);
+ret2:=call fib with (arg2);
+
+mutable integer ret;
+ret:=ret1+ret2;
+return ret;
+finish
+
+integer main()
+start
+mutable integer res:=11;
+res:=call fib with (res);
+return res;
+finish

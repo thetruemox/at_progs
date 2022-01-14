@@ -213,7 +213,7 @@ void Interpreter::_execute()
 	std::regex break_rx("break;");
 
 	std::regex fun_call_rx("(([a-zA-Z][a-zA-Z0-9]*):=)?call[ ]([a-zA-Z][a-zA-Z0-9]*)[ ]with[ ][(](.*)[)][;]"); //cg[2]=beneficiary_name, cg[3]=fun_name, cg[4]=args
-	std::regex return_rx("return[ ]((-?[0-9]+)|([\"].+[\"])|([a-zA-Z][a-zA-Z0-9]*));"); //cg[2]=number, cg[3]=str, cg[4]=variable
+	std::regex return_rx("return[ ]((-?[0-9]+)|[\"](.+)[\"]|([a-zA-Z][a-zA-Z0-9]*));"); //cg[2]=number, cg[3]=str, cg[4]=variable
 
 	std::regex robo_methods_rx("(top)|(right)|(bot)|(left)|(timeshift[(](-?[0-9]+)[)])"); //cg[1]=top, cg[2]=right, cg[3]=bot, cg[4]=left, cg[5]=timeshift, cg[6]=timeshift_arg
 
@@ -840,7 +840,7 @@ void Interpreter::_execute()
 				call_stack.pop();
 				GI = call_stack.top();
 			}
-			
+			call_stack.pop();
 			continue;
 		}
 
