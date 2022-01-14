@@ -1,0 +1,8 @@
+string main()
+start
+string str1:="Hello";
+string str2:=" World!";
+mutable string res;
+res:=str1+str2;
+return res;
+finish

@@ -1,0 +1,9 @@
+integer main()
+start
+integer op1:=2;
+integer op2:=8;
+integer op3:=20;
+
+integer res:=op3*(op1+op2)/10=20;
+return res;
+finish

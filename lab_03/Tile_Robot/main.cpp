@@ -29,10 +29,14 @@ using namespace std;
 
 int main()
 {
-	Interpreter ntrptr("robocode.txt", "labyrinth.txt");
+	//Тест с роботом
+	//Interpreter ntrptr("robocode.txt", "labyrinth.txt");
+	//Тест с рекурсией
 	//Interpreter ntrptr("recursive_test.txt", "labyrinth.txt");
+	//Тест с математическим выражением
+	//Interpreter ntrptr("math_test.txt", "labyrinth.txt");
+	//Тест с конкатенацией строк
+	Interpreter ntrptr("str_test.txt", "labyrinth.txt");
 
-	//int num = foo(0);
-	//cout << num;
     return 0;
 }

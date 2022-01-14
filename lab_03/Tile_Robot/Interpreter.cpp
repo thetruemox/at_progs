@@ -204,7 +204,7 @@ void Interpreter::_execute()
 
 	std::regex var_operand("([a-zA-Z][a-zA-Z0-9]*)"); //cg[1]=variable
 	std::regex int_operand("(-?[0-9]+)|([a-zA-Z][a-zA-Z0-9]*)"); //cg[1]=number, cg[2]=variable
-	std::regex str_operand("([\"].+[\"])|([a-zA-Z][a-zA-Z0-9]*)"); //cg[1]=str, cg[2]=variable
+	std::regex str_operand("[\"](.+)[\"]|([a-zA-Z][a-zA-Z0-9]*)"); //cg[1]=str, cg[2]=variable
 	
 	std::regex checkzero_rx("checkzero[ ][(](.+)[)]"); //cg[1]=expr
 	std::regex while_rx("while[ ][(](.+)[)]"); //cg[1]=expr
@@ -557,7 +557,14 @@ void Interpreter::_execute()
 					{
 						dynamic_cast<String*>(orig_var)->set_value(local_cg[1]);
 					}
-					else throw (std::string)("Attempt to assign an unknown value to a string, at line: " + std::to_string(GI + 1));
+					else //Выражение
+					{
+						String* result = new String("result");
+						ST_Calculator str_calculator(crutch);
+						str_calculator.calculate(result, cur_context, str_calculator.get_root());
+						dynamic_cast<String*>(orig_var)->set_value(result->get_value());
+						delete result;
+					}
 				}
 
 				break;
@@ -883,10 +890,18 @@ void Interpreter::_execute()
 	}
 	else
 	{
-		//Обычно функция main возвращает int, но для отладки и экспериментов можно поставить case на большее число типов
-
-		std::cout << "Function main returned " + std::to_string(dynamic_cast<Integer*>(this->functions["main"]->get_return_var())->get_value());
-		//std::cout << "Function main returned " + dynamic_cast<String*>(this->functions["main"]->get_return_var())->get_value();
+		switch (this->functions["main"]->get_ret_type())
+		{
+		case vt_Integer:
+			std::cout << "Function main returned " + std::to_string(dynamic_cast<Integer*>(this->functions["main"]->get_return_var())->get_value());
+			break;
+		case vt_String:
+			std::cout << "Function main returned \"" + dynamic_cast<String*>(this->functions["main"]->get_return_var())->get_value() + "\"";
+			break;
+		
+		default:
+			std::cout << "Main can`t return such type at this moment(" << std::endl;
+			break;
+		}
 	}
-
 }
