@@ -27,9 +27,12 @@ public:
 private:
 	//В этом стеке находится номер позиции в коде, к которой необходимо вернуться в случае встречи return, finish или начала программы
 	std::stack<int> call_stack;
+	//В этом стеке хранятся контексты вызываемых функций
+	std::stack<Function*> context_stack;
 
 	std::vector<std::string> code;
 	std::map<std::string, Function*> functions;
+	
 
 	Robot* robot;
 

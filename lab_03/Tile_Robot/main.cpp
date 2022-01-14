@@ -16,7 +16,8 @@
 using namespace std;
 
 /* todo
-* 
+* Пример с рекурсией
+* 15:30
 */
 
 /* Баги (Фичи?)
@@ -28,8 +29,10 @@ using namespace std;
 
 int main()
 {
-	//Interpreter ntrptr("str_test.txt", "labyrinth.txt");
 	Interpreter ntrptr("robocode.txt", "labyrinth.txt");
+	//Interpreter ntrptr("recursive_test.txt", "labyrinth.txt");
 
+	//int num = foo(0);
+	//cout << num;
     return 0;
 }

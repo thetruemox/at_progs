@@ -217,7 +217,8 @@ void Interpreter::_execute()
 
 	std::regex robo_methods_rx("(top)|(right)|(bot)|(left)|(timeshift[(](-?[0-9]+)[)])"); //cg[1]=top, cg[2]=right, cg[3]=bot, cg[4]=left, cg[5]=timeshift, cg[6]=timeshift_arg
 
-	Function* cur_context = this->functions["main"]; //Функция, внутри контекста которой работает интерпретатор
+	context_stack.push(this->functions["main"]);
+	Function* cur_context = context_stack.top(); //Функция, внутри контекста которой работает интерпретатор
 	int GI = this->call_stack.top(); //Глобальный индекс
 	this->call_stack.pop();
 
@@ -393,6 +394,9 @@ void Interpreter::_execute()
 			Function* called_fun = this->functions[cg[3]];
 			if (called_fun == nullptr) throw (std::string)("There is no such function '" + cg[3].str() + "', at line: " + std::to_string(GI + 1));
 
+			//В functions хранятся объявления функций, для последующей работы необходимо создать новый экземпляр и поместить его в context_stack
+			called_fun = called_fun->make_copy();
+
 			//Проверка бенефициара
 			if (cg[2].length() != 0)
 			{
@@ -456,7 +460,9 @@ void Interpreter::_execute()
 			GI = called_fun->get_start_i();
 
 			called_fun->set_called_context(cur_context);
-			cur_context = called_fun;
+
+			context_stack.push(called_fun);
+			cur_context = context_stack.top();
 
 			continue;
 		}
@@ -814,13 +820,20 @@ void Interpreter::_execute()
 			}
 
 			cur_context->make_benefit();
-			cur_context = cur_context->get_called_context();
 
-			if (cur_context == nullptr) break; //Return из main, завершение работы программы
+			context_stack.pop();
+			if (context_stack.empty()) break; //Return из main, завершение работы программы
+			cur_context = context_stack.top();
 
+
+			//call_stack.pop();
 			GI = call_stack.top();
-			call_stack.pop();
-
+			while (!regex_match(code[GI-1], fun_call_rx))
+			{
+				call_stack.pop();
+				GI = call_stack.top();
+			}
+			
 			continue;
 		}
 

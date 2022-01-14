@@ -78,6 +78,18 @@ void Function::make_benefit()
 	}
 }
 
+Function* Function::make_copy()
+{
+	Function* new_foo = new Function(this->return_var, this->name, this->start_i);
+	
+	for (int i = 0; i < this->args.size(); i++)
+	{
+		new_foo->add_arg(*this->args[i]);
+	}
+	
+	return new_foo;
+}
+
 void Function::set_called_context(Function* context)
 {
 	this->called_context = context;

@@ -1,6 +1,0 @@
-integer main()
-start
-mutable string str:="Hello World!";
-str:="Hi";
-return 0;
-finish

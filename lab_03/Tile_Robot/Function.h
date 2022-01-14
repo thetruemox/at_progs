@@ -26,6 +26,8 @@ public:
 	void set_beneficiary(Variable* beneficiary); //Установка бенефициара функции
 	void make_benefit(); //Передача бенефициару возвращаемое значение
 
+	Function* make_copy();
+
 	void set_called_context(Function* context); //Установка контекста из которого вызывается функция
 	Function* get_called_context(); //Получение контекста из которого была вызывана функция
 private:

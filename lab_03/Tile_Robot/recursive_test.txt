@@ -1,0 +1,22 @@
+integer foo(integer n)
+start
+
+checkzero (n=10)
+start
+n:=n+1;
+n:=call foo with (n);
+finish
+instead
+start
+return n;
+finish
+
+return n;
+finish
+
+integer main()
+start
+mutable integer res:=1;
+res:=call foo with (res);
+return res;
+finish
