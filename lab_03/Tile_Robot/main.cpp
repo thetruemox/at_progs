@@ -39,7 +39,9 @@ int main()
 	//Тест с конкатенацией строк
 	//Interpreter ntrptr("str_test.txt", "labyrinth.txt");
 	//Тест с числами Фибоначчи
-	Interpreter ntrptr("fibonacci_test.txt", "labyrinth.txt");
+	//Interpreter ntrptr("fibonacci_test.txt", "labyrinth.txt");
+
+	Interpreter ntrptr("array_test.txt", "labyrinth.txt");
 
     return 0;
 }

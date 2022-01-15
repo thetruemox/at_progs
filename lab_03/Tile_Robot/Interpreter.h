@@ -11,6 +11,7 @@
 #include "Variables/Variable.h"
 #include "Variables/String.h"
 #include "Variables/Pointer.h"
+#include "Variables/Array.h"
 #include "Robot/Robot.h"
 
 class Interpreter

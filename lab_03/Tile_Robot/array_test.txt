@@ -1,0 +1,39 @@
+integer main()
+start
+mutable array of integer arr[5];
+arr[0]:=5;
+arr[1]:=1;
+arr[2]:=7;
+arr[3]:=2;
+arr[4]:=4;
+
+mutable integer size:=?arr;
+mutable integer i:=0;
+mutable integer j:=0;
+mutable integer tmp;
+
+while (i<size-1)
+start
+
+while (j<size-1)
+start
+
+checkzero (arr[j]>arr[j+1])
+start
+finish
+instead
+start
+tmp:=arr[j];
+arr[j]:=arr[j+1];
+arr[j+1]:=tmp;
+finish
+
+j:=j+1;
+finish
+
+j:=0;
+i:=i+1;
+finish
+
+return size;
+finish

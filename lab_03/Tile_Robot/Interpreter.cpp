@@ -202,6 +202,9 @@ void Interpreter::_execute()
 	std::regex var_declaration_rx("((mutable)[ ])?(integer|string|pointer<(integer|string)>)[ ]([a-zA-Z][a-zA-Z0-9]*)((;)|:=(.+);)"); //cg[2]=mutable, cg[3]=var_type, cg[4]=pointer_type, cg[5]=var_name, cg[7]=only_declaration, cg[8]=assigment
 	std::regex var_assignment_rx("([a-zA-Z][a-zA-Z0-9]*):=(([a-zA-Z][a-zA-Z0-9]*)|(.+));"); //cg[1]=var_name, cg[3]=variable, cg[4]=expr
 
+	std::regex array_declaration_rx("((mutable)[ ])?array[ ]of[ ](integer|string)[ ]([a-zA-Z][a-zA-Z0-9]*)[\\[]((-?[0-9]+)|([a-zA-Z][a-zA-Z0-9]*)|(.+))?[\\]][;]"); //cg[2]=mutable, cg[3]=array_type, cg[4]=array_name, cg[5]=is_there_size, cg[6]=int_size, cg[7]=var_size, cg[8]=expr_size
+	std::regex array_assignment_rx("([a-zA-Z][a-zA-Z0-9]*)[\\[](.+)[\\]]:=(.+);"); //cg[1]=array_name, cg[2]=array_index, cg[3]=expr
+
 	std::regex var_operand("([a-zA-Z][a-zA-Z0-9]*)"); //cg[1]=variable
 	std::regex int_operand("(-?[0-9]+)|([a-zA-Z][a-zA-Z0-9]*)"); //cg[1]=number, cg[2]=variable
 	std::regex str_operand("[\"](.+)[\"]|([a-zA-Z][a-zA-Z0-9]*)"); //cg[1]=str, cg[2]=variable
@@ -388,6 +391,93 @@ void Interpreter::_execute()
 			continue;
 		}
 		
+		//Объявление массива
+		if (regex_match(code[GI].c_str(), cg, array_declaration_rx))
+		{
+			/*
+			* Модификатор mutable является опциональным, его присутствие указывает на то, что массив  
+			* является статическим, в этом случае поле арифметического выражения, определяющее размер, 
+			* является обязательным; в случае динамических массивов, присутствие поля c размером – указывает 
+			* нижнюю границу массива и квант увеличения/уменьшения;
+			*/
+
+			if (cg[2].length() != 0) //Статический массив
+			{
+				//Массив статический, поэтому необходимо узнать его размер
+				int arr_size = -1;
+				Integer* int_ptr;
+
+				if (cg[6].length() != 0) //Размер задан числом
+				{
+					arr_size = std::stoi(cg[6]);
+				} 
+				else if (cg[7].length() != 0) //Размер задан переменной
+				{
+					int_ptr = dynamic_cast<Integer*>(cur_context->get_var(cg[7]));
+					if (int_ptr == nullptr) throw (std::string)("Wrong type of variable specifying array size, at line: " + std::to_string(GI + 1));
+					arr_size = int_ptr->get_value();
+				}
+				else //Размер задан выражением
+				{
+					ST_Calculator int_calculator(cg[8]);
+					int_ptr = new Integer("tmp");
+					int_calculator.calculate(int_ptr, cur_context, int_calculator.get_root());
+					arr_size = int_ptr->get_value();
+					delete int_ptr;
+				}
+				if (arr_size <= 0) throw (std::string)("Array size is not defined, at line: " + std::to_string(GI + 1));
+
+				//Размер найден, определяем тип массива
+				if (cg[3] == "integer") //Массив целых чисел
+				{
+					cur_context->add_var(new Array(cg[4], vt_Integer, arr_size));
+				}
+			}
+			else //Динамический массив
+			{
+
+			}
+
+			GI++;
+			continue;
+		}
+
+		//Присваивание элемента массива
+		if (regex_match(code[GI].c_str(), cg, array_assignment_rx))
+		{
+			Array* arr_ptr = dynamic_cast<Array*>(cur_context->get_var(cg[1]));
+			if (arr_ptr == nullptr) throw (std::string)("There is no such array named '" + cg[1].str() + "', at line: " + std::to_string(GI + 1));
+
+			ST_Calculator index_calc(cg[2]); //Калькулятор индекса
+			Integer* arr_index = new Integer("tmp");
+			index_calc.calculate(arr_index, cur_context, index_calc.get_root());
+
+			if (arr_index->get_value() < 0) throw (std::string)("Array size is not defined, at line: " + std::to_string(GI + 1));
+
+			ST_Calculator expr_calc(cg[3]); //Калькулятор присваиваемого значения
+			Integer* arr_expr;
+
+			switch (arr_ptr->get_contained_type())
+			{
+			case vt_Integer:
+				arr_expr = new Integer("tmp");
+				expr_calc.calculate(arr_expr, cur_context, expr_calc.get_root());
+
+				arr_ptr->set_value(arr_expr, arr_index->get_value());
+
+				delete arr_expr;
+				break;
+			default:
+				throw (std::string)("This type of arrays are not supported yet, at line: " + std::to_string(GI + 1));
+				break;
+			}
+
+			delete arr_index;
+
+			GI++;
+			continue;
+		}
+
 		//Вызов функции
 		if (regex_match(code[GI].c_str(), cg, fun_call_rx))
 		{

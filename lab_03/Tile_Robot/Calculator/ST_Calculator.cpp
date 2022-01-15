@@ -135,12 +135,41 @@ ST_Calculator::ST_Calculator(std::string math_expr)
 
 void ST_Calculator::calculate(Integer* result, Function* cur_fun, ST_Node* cur_node)
 {
-    std::regex name("[a-zA-Z][a-zA-Z0-9]*");
+    std::regex name("([\\?])?([a-zA-Z][a-zA-Z0-9]*)([\\[](.+)[\\]])?"); //cg[1]=get_size, cg[2]=var_name, cg[3]=array
+    std::cmatch cg;
 
     //Лист
     if (cur_node->left_ptr == nullptr && cur_node->right_ptr == nullptr && !cur_node->is_checked)
     {     
-        Integer* fun_var = dynamic_cast<Integer*>(cur_fun->get_var(this->node_values[cur_node->index]));
+        Integer* fun_var;
+        Integer* index = new Integer("tmp");
+        ST_Calculator* index_calc;
+
+        regex_match(this->node_values[cur_node->index].c_str(), cg, name);
+        if (cg[1].length() != 0) //Получаем размер переменной
+        {
+            fun_var = new Integer("tmp");
+            if (cur_fun->get_var(cg[2])->get_type() == vt_Array) //Возвращаем размер массива
+            {
+                fun_var->set_value(dynamic_cast<Array*>(cur_fun->get_var(cg[2]))->get_size());
+            }
+            else //Возвращаем 1
+            {
+                fun_var->set_value(1);
+            }
+        }
+        else if (cg[3].length() != 0) //Тогда это элемент массива и необходимо посчитать его индекс
+        { 
+            index_calc = new ST_Calculator(cg[4]);
+            index_calc->calculate(index, cur_fun, index_calc->get_root());
+            if (index < 0) throw (std::string)("Array size is not defined");
+
+            fun_var = dynamic_cast<Integer*>(dynamic_cast<Array*>(cur_fun->get_var(cg[2]))->get_value(index->get_value()));
+        }
+        else //Просто переменная
+        {
+            fun_var = dynamic_cast<Integer*>(cur_fun->get_var(this->node_values[cur_node->index]));
+        }
 
         cur_node->value = new Integer(std::to_string(cur_node->index));
         Integer* new_var = dynamic_cast<Integer*>(cur_node->value);
@@ -428,21 +457,38 @@ std::string ST_Calculator::a_parse(std::string reg)
     std::string parsed = "";
     std::string t_value = "";
 
+    int arr_index = 0;
     for (int i = 0; i < reg.length(); i++)
     {
+        if (reg[i] == '[')
+        {
+            arr_index = 1;
+        }
+        else if (reg[i] == ']')
+        {
+            arr_index = 0;
+        }
+
         if (!regex_match(std::string(1, reg[i]), sign))
         {
             t_value += reg[i];
         } 
         else
-        {      
-            if (t_value.size() != 0)
+        {   
+            if (arr_index != 1)
             {
-                parsed += "@";
-                this->node_values[parsed.size() - 1] = t_value;           
+                if (t_value.size() != 0)
+                {
+                    parsed += "@";
+                    this->node_values[parsed.size() - 1] = t_value;
+                }
+                parsed += std::string(1, reg[i]);
+                t_value = "";
             }
-            parsed += std::string(1, reg[i]);
-            t_value = "";
+            else
+            {
+                t_value += reg[i];
+            }
         }
     }
 

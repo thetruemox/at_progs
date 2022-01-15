@@ -11,6 +11,7 @@
 #include "../Function.h"
 #include "../Variables/Integer.h"
 #include "../Variables/String.h"
+#include "../Variables/Array.h"
 
 enum bracket_type
 {

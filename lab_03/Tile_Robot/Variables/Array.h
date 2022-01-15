@@ -8,23 +8,26 @@
 class Array : virtual public Variable
 {
 public:
-	Array(std::string arr_name, var_type contained_type);
+	//Создает статический массив
+	Array(std::string arr_name, var_type contained_type, int size);
 	var_type get_contained_type();
 	var_type get_type() override;
 	std::string get_name() override;
 
 	void set_value(Variable* value, int index);
-	void set_value(std::vector<Variable*> value);
+	void set_value(std::vector<Variable*>* value);
 
+	int get_size();
 	Variable* get_value(int index);
-	std::vector<Variable*> get_value();
+	std::vector<Variable*>* get_value();
 
 private:
 	std::string name;
+	int size;
 
 	var_type type;
 	var_type contained_type;
 
-	std::vector<Variable*> value;
+	std::vector<Variable*>* value;
 	bool is_mutable;
 };
